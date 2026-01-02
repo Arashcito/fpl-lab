@@ -1,12 +1,17 @@
 package com.arash.fpllab.service;
 
+import java.util.Locale; // local language pronunciation
+
+
 import com.arash.fpllab.client.FplClient;
 import com.arash.fpllab.model.Gameweek;
 import com.arash.fpllab.model.Player;
 import com.arash.fpllab.model.Position;
 import com.arash.fpllab.model.Team;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,6 +116,51 @@ public class FplService {
     }
 
 
+    public Player getPlayerById(int playerId) {
+        var root = bootstrap();
+        var elements = root.get("elements");
 
+        for (var p : elements) {
+            if (p.get("id").asInt() == playerId) {
+                return new Player(
+                        p.get("id").asInt(),
+                        p.get("web_name").asText(),
+                        p.get("team").asInt(),
+                        p.get("element_type").asInt(),
+                        p.get("now_cost").asInt(),
+                        p.get("total_points").asInt()
+                );
+            }
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found: " + playerId);
+
+    }
+
+    public List<Player> searchPlayers(String q) {
+        String query = q == null ? "" : q.toLowerCase(Locale.ROOT);
+
+        var root = bootstrap();
+        var elements = root.get("elements");
+
+        List<Player> results= new ArrayList<>();
+
+        for (var p : elements) {
+            String name = p.get("web_name").asText().toLowerCase(Locale.ROOT);
+            if (!name.contains(query)) {
+                continue;
+            }
+
+            results.add(new Player(
+                    p.get("id").asInt(),
+                    p.get("web_name").asText(),
+                    p.get("team").asInt(),
+                    p.get("element_type").asInt(),
+                    p.get("now_cost").asInt(),
+                    p.get("total_points").asInt()
+            ));
+        }
+        return results;
+    }
 
 }

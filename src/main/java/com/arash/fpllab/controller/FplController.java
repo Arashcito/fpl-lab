@@ -50,4 +50,17 @@ public class FplController {
     public List<Position> positions() {
         return fplService.getPositions();
     }
+
+    @GetMapping("/api/fpl/players/{id}")
+    public Player playerById(@org.springframework.web.bind.annotation.PathVariable int id) {
+        return fplService.getPlayerById(id);
+    }
+
+
+    // http://localhost:8080/api/fpl/players/search?q=salah
+    @GetMapping("/api/fpl/players/search")
+    public List<Player> search(@RequestParam String q) {
+        return fplService.searchPlayers(q);
+    }
+
 }
