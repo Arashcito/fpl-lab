@@ -1,7 +1,7 @@
 package com.arash.fpllab.service;
 
 import java.util.Locale; // local language pronunciation
-
+import java.util.Comparator;
 
 import com.arash.fpllab.client.FplClient;
 import com.arash.fpllab.model.Gameweek;
@@ -73,7 +73,7 @@ public class FplService {
                     p.get("web_name").asText(),
                     tId,
                     posId,
-                    p.get("now_cost").asInt(),
+                    p.get("now_cost").asInt() / 10.0,
                     p.get("total_points").asInt()
             ));
         }
@@ -127,7 +127,7 @@ public class FplService {
                         p.get("web_name").asText(),
                         p.get("team").asInt(),
                         p.get("element_type").asInt(),
-                        p.get("now_cost").asInt(),
+                        p.get("now_cost").asInt() / 10.0,
                         p.get("total_points").asInt()
                 );
             }
@@ -156,11 +156,50 @@ public class FplService {
                     p.get("web_name").asText(),
                     p.get("team").asInt(),
                     p.get("element_type").asInt(),
-                    p.get("now_cost").asInt(),
+                    p.get("now_cost").asInt() / 10.0,
                     p.get("total_points").asInt()
             ));
         }
         return results;
     }
 
+
+    public List<Player> getPlayersSorted(int limit) {
+        List<Player> all = getPlayers(null, null);
+
+        all.sort(Comparator.comparingInt(Player::getTotalPoints).reversed());
+
+        if (limit <= 0) limit = 20;
+        if (limit > all.size()) limit = all.size();
+        return all.subList(0, limit);
+    }
+
+    public List<Player> getPlayersSorted(Integer teamId, Integer positionId, String sortBy,
+                                         String order, Integer limit) {
+        List<Player> players = getPlayers(teamId, positionId);
+
+        Comparator<Player> comparator;
+
+        if ("price".equalsIgnoreCase(sortBy)) {
+            comparator = Comparator.comparingDouble(Player::getPrice);
+        } else if ("name".equalsIgnoreCase(sortBy)) {
+            comparator = Comparator.comparing(Player::getWebName, String.CASE_INSENSITIVE_ORDER);
+        } else { // default = points
+            comparator = Comparator.comparingInt(Player::getTotalPoints);
+        }
+
+        if ("desc".equalsIgnoreCase(order)) {
+            comparator = comparator.reversed();
+        }
+
+        players.sort(comparator);
+
+        if (limit != null) {
+            int l = Math.max(1, limit);
+            if (1 < players.size()) {
+                return players.subList(0, l);
+            }
+        }
+        return players;
+    }
 }

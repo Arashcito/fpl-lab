@@ -32,15 +32,6 @@ public class FplController {
         return fplService.getTeams();
     }
 
-    // Clean players list (optional filters)
-    // Example: /api/fpl/players?teamId=1&positionId=3
-    @GetMapping("/api/fpl/players")
-    public List<Player> players(@RequestParam(required = false) Integer teamId,
-                                @RequestParam(required = false) Integer positionId) {
-
-        return fplService.getPlayers(teamId, positionId);
-    }
-
     @GetMapping("/api/fpl/gameweeks")
     public List<Gameweek> gameweeks() {
         return fplService.getGameweeks();
@@ -57,10 +48,29 @@ public class FplController {
     }
 
 
-    // http://localhost:8080/api/fpl/players/search?q=salah
+    // example : http://localhost:8080/api/fpl/players/search?q=salah
     @GetMapping("/api/fpl/players/search")
     public List<Player> search(@RequestParam String q) {
         return fplService.searchPlayers(q);
+    }
+
+    // example : http://localhost:8080/api/fpl/players/top?limit=10
+    @GetMapping("/api/fpl/players/top")
+    public List<Player> topPlayers(@RequestParam(defaultValue = "20") int limit) {
+        return fplService.getPlayersSorted(limit);
+    }
+
+    // Clean players list (optional filters and sorting)
+    // Example: /api/fpl/players?teamId=1&positionId=3&sortBy=price&order=asc&limit=10
+    @GetMapping("/api/fpl/players")
+    public List<Player> players(
+            @RequestParam(required = false) Integer teamId,
+            @RequestParam(required = false) Integer positionId,
+            @RequestParam(defaultValue = "points") String sortBy,
+            @RequestParam(defaultValue = "desc") String order,
+            @RequestParam(required = false) Integer limit
+    ) {
+        return fplService.getPlayersSorted(teamId, positionId, sortBy, order, limit);
     }
 
 }

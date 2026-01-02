@@ -5,14 +5,15 @@ public class Player {
     private String webName;
     private int teamId;
     private int positionId;
-    private int nowCost;
+    private double price;
     private int totalPoints;
 
-    public Player(int id, String webName, int teamId, int positionId, int nowCost, int totalPoints) {
+    public Player(int id, String webName, int teamId, int positionId, double price, int totalPoints) {
         this.id = id;
         this.webName = webName;
         this.teamId = teamId;
-        this.nowCost = nowCost;
+        this.positionId = positionId;
+        this.price = price;
         this.totalPoints = totalPoints;
     }
 
@@ -32,8 +33,8 @@ public class Player {
         return positionId;
     }
 
-    public int getNowCost() {
-        return nowCost;
+    public double getPrice() {
+        return price;
     }
 
     public int getTotalPoints() {
