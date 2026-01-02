@@ -1,8 +1,8 @@
 package com.arash.fpllab.service;
 
-import java.util.Locale; // local language pronunciation
-import java.util.Comparator;
+import java.util.*;
 
+import com.arash.fpllab.dto.PlayerView;
 import com.arash.fpllab.client.FplClient;
 import com.arash.fpllab.model.Gameweek;
 import com.arash.fpllab.model.Player;
@@ -12,9 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -202,4 +199,52 @@ public class FplService {
         }
         return players;
     }
+
+    private Map<Integer, String> teamIdToName() {
+        var root = bootstrap();
+        var teams = root.get("teams");
+
+        Map<Integer, String> map = new HashMap<>();
+        for (var t : teams) {
+            map.put(t.get("id").asInt(), t.get("name").asText());
+        }
+        return map;
+    }
+
+    private Map<Integer, String> positionIdToName() {
+        var root = bootstrap();
+        var types = root.get("element_types");
+
+        Map<Integer, String> map = new HashMap<>();
+        for (var p : types) {
+            map.put(p.get("id").asInt(), p.get("singular_name").asText());
+        }
+        return map;
+    }
+
+    public List<PlayerView> getPlayerViews(Integer teamId, Integer positionId,
+                                           String sortBy, String order, Integer limit) {
+
+        Map<Integer, String> teamNames = teamIdToName();
+        Map<Integer, String> posNames = positionIdToName();
+
+        // reuse your sorted players
+        List<Player> players = getPlayersSorted(teamId, positionId, sortBy, order, limit);
+
+        List<PlayerView> result = new ArrayList<>();
+        for (Player p : players) {
+            result.add(new PlayerView(
+                    p.getId(),
+                    p.getWebName(),
+                    p.getTeamId(),
+                    teamNames.getOrDefault(p.getTeamId(), "Unknown"),
+                    p.getPositionId(),
+                    posNames.getOrDefault(p.getPositionId(), "Unknown"),
+                    p.getPrice(),
+                    p.getTotalPoints()
+            ));
+        }
+        return result;
+    }
+
 }

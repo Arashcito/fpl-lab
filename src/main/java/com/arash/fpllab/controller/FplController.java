@@ -1,5 +1,6 @@
 package com.arash.fpllab.controller;
 
+import com.arash.fpllab.dto.PlayerView;
 import com.arash.fpllab.model.*;
 import com.arash.fpllab.service.FplService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,16 +62,24 @@ public class FplController {
     }
 
     // Clean players list (optional filters and sorting)
-    // Example: /api/fpl/players?teamId=1&positionId=3&sortBy=price&order=asc&limit=10
+    // limit=10
+    // Test examples
+    // Example: /api/fpl/players?teamId=1&positionId=3&sortBy=price&order=asc&
+    //Top 20 by points (default):
+    //http://localhost:8080/api/fpl/players
+    //Cheapest 30 Arsenal players:
+    //http://localhost:8080/api/fpl/players?teamId=1&sortBy=price&order=asc&limit=30
+    //A–Z midfielders:
+    //http://localhost:8080/api/fpl/players?positionId=3&sortBy=name&order=asc
     @GetMapping("/api/fpl/players")
-    public List<Player> players(
+    public List<PlayerView> players(
             @RequestParam(required = false) Integer teamId,
             @RequestParam(required = false) Integer positionId,
             @RequestParam(defaultValue = "points") String sortBy,
             @RequestParam(defaultValue = "desc") String order,
             @RequestParam(required = false) Integer limit
     ) {
-        return fplService.getPlayersSorted(teamId, positionId, sortBy, order, limit);
+        return fplService.getPlayerViews(teamId, positionId, sortBy, order, limit);
     }
 
 }
