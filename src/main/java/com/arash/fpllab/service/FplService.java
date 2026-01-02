@@ -1,7 +1,9 @@
 package com.arash.fpllab.service;
 
 import com.arash.fpllab.client.FplClient;
+import com.arash.fpllab.model.Gameweek;
 import com.arash.fpllab.model.Player;
+import com.arash.fpllab.model.Position;
 import com.arash.fpllab.model.Team;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -72,6 +74,40 @@ public class FplService {
         }
 
         return players;
+    }
+
+    public List<Gameweek> getGameweeks() {
+        var root = bootstrap();
+        var events = root.get("events");
+
+        List<Gameweek> result = new ArrayList<>();
+        for (var e : events) {
+            result.add(new Gameweek(
+                    e.get("id").asInt(),
+                    e.get("name").asText(),
+                    e.get("deadline_time").asText(),
+                    e.get("is_current").asBoolean(),
+                    e.get("is_next").asBoolean()
+            ));
+        }
+        return result;
+    }
+
+
+    public List<Position> getPositions() {
+        var root = bootstrap();
+        var types = root.get("element_types");
+
+        List<Position> result = new ArrayList<>();
+        for (var t : types) {
+            result.add(new Position(
+                    t.get("id").asInt(),
+                    t.get("singular_name").asText(),
+                    t.get("singular_name_short").asText()
+            ));
+
+        }
+        return result;
     }
 
 
