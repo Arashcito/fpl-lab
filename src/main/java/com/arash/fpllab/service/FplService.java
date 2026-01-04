@@ -193,7 +193,7 @@ public class FplService {
 
         if (limit != null) {
             int l = Math.max(1, limit);
-            if (1 < players.size()) {
+            if (l < players.size()) {
                 return players.subList(0, l);
             }
         }
