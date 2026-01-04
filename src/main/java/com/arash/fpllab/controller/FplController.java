@@ -114,7 +114,16 @@ public class FplController {
         return fplService.getPlayerViewsFromDb(limit);
     }
 
-
+    @GetMapping("/api/db/players/query")
+    public List<PlayerEntity> queryDbPlayers(
+            @RequestParam(required = false) Integer teamId,
+            @RequestParam(required = false) Integer positionId,
+            @RequestParam(defaultValue = "points") String sortBy,
+            @RequestParam(defaultValue = "desc") String order,
+            @RequestParam(defaultValue = "50") Integer limit
+    ) {
+        return fplService.queryPlayersFromDb(teamId, positionId, sortBy, order, limit);
+    }
 
 
 }
