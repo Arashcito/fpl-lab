@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPL Lab - Players</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FPL Lab</h1>
+            <p>Fantasy Premier League Players</p>
+        </div>
+        
+        <div class="content">
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-players">-</div>
+                    <div class="stat-label">Total Players</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-points">-</div>
+                    <div class="stat-label">Avg Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-price">-</div>
+                    <div class="stat-label">Avg Price</div>
+                </div>
+            </div>
+            
+            <div class="players-section">
+                <h2 class="section-title">Players</h2>
+                <ul id="players">
+                    <li class="loading">Loading players...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/players.js"></script>
+</body>
+</html>

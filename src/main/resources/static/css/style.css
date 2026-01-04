@@ -1,0 +1,160 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ebe1d1;
+    padding: 20px;
+    color: #0d4715;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    background-color: #41644a;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 2em;
+    margin-bottom: 5px;
+}
+
+.header p {
+    font-size: 1em;
+    opacity: 0.9;
+}
+
+.content {
+    padding: 10px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background-color: #ebe1d1;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+    border: 2px solid #41644a;
+}
+
+.stat-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #0d4715;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #41644a;
+    font-size: 0.9em;
+}
+
+.players-section {
+    margin-top: 20px;
+}
+
+.section-title {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    color: #0d4715;
+}
+
+#players {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.player-card {
+    background-color: #ebe1d1;
+    border: 2px solid #41644a;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.player-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #0d4715;
+    margin-bottom: 10px;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.player-detail {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+}
+
+.player-detail-label {
+    color: #41644a;
+}
+
+.player-detail-value {
+    font-weight: bold;
+    color: #0d4715;
+}
+
+.points {
+    color: #0d4715;
+}
+
+.price {
+    color: #e9762b;
+}
+
+.team {
+    color: #41644a;
+}
+
+.loading {
+    text-align: center;
+    padding: 30px;
+    color: #41644a;
+}
+
+.error {
+    background-color: #ebe1d1;
+    color: #0d4715;
+    padding: 15px;
+    border-radius: 6px;
+    border: 2px solid #e9762b;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+    
+    #players {
+        grid-template-columns: 1fr;
+    }
+}
