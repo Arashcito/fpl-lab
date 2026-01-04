@@ -2,6 +2,7 @@ package com.arash.fpllab.service;
 
 import java.util.*;
 
+import com.arash.fpllab.dto.PlayerDbView;
 import com.arash.fpllab.dto.PlayerView;
 import com.arash.fpllab.client.FplClient;
 import com.arash.fpllab.entity.PlayerEntity;
@@ -301,5 +302,51 @@ public class FplService {
     public List<PlayerEntity> getPlayersFromDb() {
         return playerRepository.findAll();
     }
+
+    private String positionName(int positionId) {
+        switch (positionId) {
+            case 1:
+                return "Goalkeeper";
+            case 2:
+                return "Defender";
+            case 3:
+                return "Midfielder";
+            case 4:
+                return "Forward";
+            default:
+                return "Unknown";
+        }
+    }
+
+    public List<PlayerDbView> getPlayerViewsFromDb(Integer limit) {
+
+        // teamId -> teamName
+        Map<Integer, String> teamNames = new HashMap<>();
+        for (var t : teamRepository.findAll()) {
+            teamNames.put(t.getId(), t.getName());
+        }
+
+        var players = playerRepository.findAll();
+
+        int max = (limit == null || limit <= 0) ? 50 : limit;
+
+        List<PlayerDbView> result = new ArrayList<>();
+        for (int i = 0; i < players.size() && i < max; i++) {
+            var p = players.get(i);
+
+            result.add(new PlayerDbView(
+                    p.getId(),
+                    p.getWebName(),
+                    teamNames.getOrDefault(p.getTeamId(), "Unknown"),
+                    positionName(p.getPositionId()),
+                    p.getPrice(),
+                    p.getTotalPoints()
+            ));
+        }
+
+        return result;
+    }
+
+
 
 }

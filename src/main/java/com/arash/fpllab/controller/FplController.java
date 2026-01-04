@@ -1,5 +1,6 @@
 package com.arash.fpllab.controller;
 
+import com.arash.fpllab.dto.PlayerDbView;
 import com.arash.fpllab.dto.PlayerView;
 import com.arash.fpllab.entity.PlayerEntity;
 import com.arash.fpllab.entity.TeamEntity;
@@ -104,6 +105,13 @@ public class FplController {
     @GetMapping("/api/db/players")
     public List<PlayerEntity> dbPlayers() {
         return fplService.getPlayersFromDb();
+    }
+
+
+    // example  : http://localhost:8080/api/db/players/view?limit=20
+    @GetMapping("/api/db/players/view")
+    public List<PlayerDbView> dbPlayersView(@RequestParam(required = false) Integer limit) {
+        return fplService.getPlayerViewsFromDb(limit);
     }
 
 
