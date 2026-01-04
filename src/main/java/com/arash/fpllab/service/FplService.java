@@ -376,19 +376,63 @@ public class FplService {
         return playerRepository.findAll(pageable).getContent();
     }
 
+    public List<PlayerDbView> queryPlayerViewsFromDb(Integer teamId, Integer positionId,
+                                                     String sortBy, String order, Integer limit) {
 
-    /**
-     *
-     * Top 20 by points:
-     * http://localhost:8080/api/db/players/query?limit=20
-     * Cheapest 30 Arsenal players:
-     * http://localhost:8080/api/db/players/query?teamId=1&sortBy=price&order=asc&limit=30
-     * A–Z midfielders:
-     * http://localhost:8080/api/db/players/query?positionId=3&sortBy=name&order=asc&limit=50
-     * Arsenal midfielders by points:
-     * http://localhost:8080/api/db/players/query?teamId=1&positionId=3&sortBy=points&order=desc&limit=50
-     *
-     * */
+        // 1) Get filtered/sorted players from DB
+        List<PlayerEntity> players = queryPlayersFromDb(teamId, positionId, sortBy, order, limit);
 
+        // 2) Build teamId -> teamName map once
+        Map<Integer, String> teamNames = new HashMap<>();
+        for (var t : teamRepository.findAll()) {
+            teamNames.put(t.getId(), t.getName());
+        }
+
+        // 3) Convert entities -> views
+        List<PlayerDbView> result = new ArrayList<>();
+        for (var p : players) {
+            result.add(new PlayerDbView(
+                    p.getId(),
+                    p.getWebName(),
+                    teamNames.getOrDefault(p.getTeamId(), "Unknown"),
+                    positionName(p.getPositionId()),
+                    p.getPrice(),
+                    p.getTotalPoints()
+            ));
+        }
+
+        return result;
+    }
+
+
+    public List<PlayerDbView> searchPlayerViewsFromDb(String q, Integer limit) {
+
+        int size = (limit == null || limit <= 0) ? 20 : Math.min(limit, 100);
+        var pageable = PageRequest.of(0, size);
+
+        // DB search
+        List<PlayerEntity> players = playerRepository.searchByWebName(q == null ? "" : q, pageable);
+
+        // team map
+        Map<Integer, String> teamNames = new HashMap<>();
+        for (var t : teamRepository.findAll()) {
+            teamNames.put(t.getId(), t.getName());
+        }
+
+        // convert
+        List<PlayerDbView> result = new ArrayList<>();
+        for (var p : players) {
+            result.add(new PlayerDbView(
+                    p.getId(),
+                    p.getWebName(),
+                    teamNames.getOrDefault(p.getTeamId(), "Unknown"),
+                    positionName(p.getPositionId()),
+                    p.getPrice(),
+                    p.getTotalPoints()
+            ));
+        }
+
+        return result;
+    }
 
 }

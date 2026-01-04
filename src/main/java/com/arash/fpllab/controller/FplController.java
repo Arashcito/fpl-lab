@@ -125,6 +125,39 @@ public class FplController {
         return fplService.queryPlayersFromDb(teamId, positionId, sortBy, order, limit);
     }
 
+    /**
+     *
+     * Top 20 by points:
+     * http://localhost:8080/api/db/players/query?limit=20
+     * Cheapest 30 Arsenal players:
+     * http://localhost:8080/api/db/players/query?teamId=1&sortBy=price&order=asc&limit=30
+     * A–Z midfielders:
+     * http://localhost:8080/api/db/players/query?positionId=3&sortBy=name&order=asc&limit=50
+     * Arsenal midfielders by points:
+     * http://localhost:8080/api/db/players/query?teamId=1&positionId=3&sortBy=points&order=desc&limit=50
+     *
+     * */
 
+    @GetMapping("/api/db/players/query/view")
+    public List<PlayerDbView> queryDbPlayersView(
+            @RequestParam(required = false) Integer teamId,
+            @RequestParam(required = false) Integer positionId,
+            @RequestParam(defaultValue = "points") String sortBy,
+            @RequestParam(defaultValue = "desc") String order,
+            @RequestParam(defaultValue = "50") Integer limit
+    ) {
+        return fplService.queryPlayerViewsFromDb(teamId, positionId, sortBy, order, limit);
+    }
+
+
+    //http://localhost:8080/api/db/players/search/view?q=salah
+    //http://localhost:8080/api/db/players/search/view?q=haaland&limit=10
+    @GetMapping("/api/db/players/search/view")
+    public List<PlayerDbView> searchDbPlayersView(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "20") Integer limit
+    ) {
+        return fplService.searchPlayerViewsFromDb(q, limit);
+    }
 
 }
