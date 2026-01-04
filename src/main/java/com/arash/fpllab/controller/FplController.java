@@ -1,6 +1,8 @@
 package com.arash.fpllab.controller;
 
 import com.arash.fpllab.dto.PlayerView;
+import com.arash.fpllab.entity.PlayerEntity;
+import com.arash.fpllab.entity.TeamEntity;
 import com.arash.fpllab.model.*;
 import com.arash.fpllab.service.FplService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,5 +83,30 @@ public class FplController {
     ) {
         return fplService.getPlayerViews(teamId, positionId, sortBy, order, limit);
     }
+
+    @GetMapping("api/db/sync/teams")
+    public String syncTeams() {
+        int saved = fplService.syncTeamsToDB();
+        return "Saved: " + saved + " teams to DB";
+    }
+
+    @GetMapping("api/db/teams")
+    public List<TeamEntity> dbTeams() {
+        return fplService.getTeamsFromDb();
+    }
+
+    @GetMapping("/api/db/sync/players")
+    public String syncPlayers() {
+        int saved = fplService.syncPlayersToDb();
+        return "Saved " + saved + " players to DB ✅";
+    }
+
+    @GetMapping("/api/db/players")
+    public List<PlayerEntity> dbPlayers() {
+        return fplService.getPlayersFromDb();
+    }
+
+
+
 
 }

@@ -4,10 +4,14 @@ import java.util.*;
 
 import com.arash.fpllab.dto.PlayerView;
 import com.arash.fpllab.client.FplClient;
+import com.arash.fpllab.entity.PlayerEntity;
+import com.arash.fpllab.entity.TeamEntity;
 import com.arash.fpllab.model.Gameweek;
 import com.arash.fpllab.model.Player;
 import com.arash.fpllab.model.Position;
 import com.arash.fpllab.model.Team;
+import com.arash.fpllab.repository.PlayerRepository;
+import com.arash.fpllab.repository.TeamRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,9 +22,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class FplService {
 
     private final FplClient fplClient;
+    private final TeamRepository teamRepository;
+    private final PlayerRepository playerRepository;
 
-    public FplService(FplClient fplClient) {
+
+
+    public FplService(FplClient fplClient, TeamRepository teamRepository, PlayerRepository playerRepository) {
         this.fplClient = fplClient;
+        this.teamRepository = teamRepository;
+        this.playerRepository = playerRepository;
     }
 
     public JsonNode bootstrap() {
@@ -247,5 +257,49 @@ public class FplService {
         return result;
     }
 
+    public int syncTeamsToDB() {
+        JsonNode root = bootstrap();
+        JsonNode teams = root.get("teams");
+
+        int count = 0;
+        for (JsonNode t : teams) {
+            TeamEntity team = new TeamEntity(
+                    t.get("id").asInt(),
+                    t.get("name").asText(),
+                    t.get("short_name").asText()
+            );
+            teamRepository.save(team);
+            count++;
+        }
+        return count;
+    }
+
+    public List<TeamEntity> getTeamsFromDb() {
+        return teamRepository.findAll();
+    }
+
+    public int syncPlayersToDb() {
+        var root = bootstrap();
+        var elements = root.get("elements");
+
+        int count = 0;
+        for (var p : elements) {
+            PlayerEntity player = new PlayerEntity(
+                    p.get("id").asInt(),
+                    p.get("web_name").asText(),
+                    p.get("team").asInt(),
+                    p.get("element_type").asInt(),
+                    p.get("now_cost").asInt() / 10.0,
+                    p.get("total_points").asInt()
+            );
+            playerRepository.save(player);
+            count++;
+        }
+        return count;
+    }
+
+    public List<PlayerEntity> getPlayersFromDb() {
+        return playerRepository.findAll();
+    }
 
 }
