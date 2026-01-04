@@ -13,6 +13,8 @@ import com.arash.fpllab.model.Position;
 import com.arash.fpllab.model.Team;
 import com.arash.fpllab.repository.PlayerRepository;
 import com.arash.fpllab.repository.TeamRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -347,6 +349,32 @@ public class FplService {
         return result;
     }
 
+
+    public List<PlayerEntity> queryPlayersFromDb(Integer teamId, Integer positionId,
+                                                 String sortBy, String order, Integer limit) {
+        int size = (limit == null || limit <= 0) ? 50 : Math.min(limit, 200);
+
+        String sortField = switch (sortBy == null ? "" : sortBy.toLowerCase()) {
+            case "price" -> "price";
+            case "name" -> "webName";
+            default -> "totalPoints";
+        };
+
+        Sort.Direction direction = "asc".equalsIgnoreCase(order) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        var pageable = PageRequest.of(0, size, Sort.by(direction, sortField));
+
+        if (teamId != null && positionId != null) {
+            return playerRepository.findByTeamIdAndPositionId(teamId, positionId, pageable);
+        }
+        if (teamId != null) {
+            return playerRepository.findByTeamId(teamId, pageable);
+        }
+        if (positionId != null) {
+            return playerRepository.findByPositionId(positionId, pageable);
+        }
+        return playerRepository.findAll(pageable).getContent();
+    }
 
 
 }
