@@ -377,4 +377,18 @@ public class FplService {
     }
 
 
+    /**
+     *
+     * Top 20 by points:
+     * http://localhost:8080/api/db/players/query?limit=20
+     * Cheapest 30 Arsenal players:
+     * http://localhost:8080/api/db/players/query?teamId=1&sortBy=price&order=asc&limit=30
+     * A–Z midfielders:
+     * http://localhost:8080/api/db/players/query?positionId=3&sortBy=name&order=asc&limit=50
+     * Arsenal midfielders by points:
+     * http://localhost:8080/api/db/players/query?teamId=1&positionId=3&sortBy=points&order=desc&limit=50
+     *
+     * */
+
+
 }
