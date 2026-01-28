@@ -36,6 +36,11 @@ public class FplController {
         return fplService.getTeams();
     }
 
+    @GetMapping("/api/fpl/teams/standings")
+    public List<com.arash.fpllab.model.TeamWithStanding> teamsWithStandings() {
+        return fplService.getTeamsWithStandings();
+    }
+
     @GetMapping("/api/fpl/gameweeks")
     public List<Gameweek> gameweeks() {
         return fplService.getGameweeks();
