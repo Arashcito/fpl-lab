@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: fpllab-postgres
+    environment:
+      POSTGRES_DB: fpllab
+      POSTGRES_USER: fpllab_user
+      POSTGRES_PASSWORD: fpllab_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - fpllab_data:/var/lib/postgresql/data
+
+volumes:
+  fpllab_data:
