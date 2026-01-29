@@ -1,0 +1,7 @@
+spring.application.name=fpl-manager
+
+# Get a free key at https://www.football-data.org/
+# Override with FOOTBALL_DATA_API_KEY env var in production
+football-data.api-key=${FOOTBALL_DATA_API_KEY:your-api-key-here}
+football-data.base-url=https://api.football-data.org/v4
+football-data.pl-code=PL

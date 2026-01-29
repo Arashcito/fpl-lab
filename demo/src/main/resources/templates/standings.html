@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premier League standings – FPL Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #e2e8f0;
+            padding: 2rem;
+        }
+        .wrap {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        nav {
+            margin-bottom: 1.5rem;
+        }
+        nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        nav a:hover {
+            color: #3b82f6;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        header img {
+            height: 48px;
+            width: auto;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .season {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        .table-wrap {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.5);
+        }
+        th.num { text-align: center; }
+        td {
+            padding: 0.65rem 1rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.08);
+        }
+        td.num { text-align: center; }
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.06);
+        }
+        .pos {
+            font-weight: 700;
+            color: #94a3b8;
+            width: 2rem;
+        }
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .team img {
+            height: 24px;
+            width: 24px;
+            object-fit: contain;
+        }
+        .team span { font-weight: 500; }
+        .form {
+            font-size: 0.8rem;
+            max-width: 6rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .points { font-weight: 700; color: #e2e8f0; }
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: #fca5a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <nav><a th:href="@{/}">← Home</a></nav>
+
+        <th:block th:if="${table == null}">
+            <div class="error">Unable to load standings. Please try again later.</div>
+        </th:block>
+
+        <th:block th:if="${table != null}">
+            <header>
+                <img th:if="${response?.competition?.emblem != null}" th:src="${response.competition.emblem}" alt="" />
+                <div>
+                    <h1 th:text="${response?.competition?.name != null} ? ${response.competition.name} : 'Premier League'">Premier League</h1>
+                    <div class="season" th:if="${response?.season != null}">
+                        <span th:text="${response.season.startDate}">–</span> to <span th:text="${response.season.endDate}">–</span>
+                        · Matchday <span th:text="${response.season.currentMatchday}">–</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="num">#</th>
+                            <th>Club</th>
+                            <th class="num">P</th>
+                            <th class="num">W</th>
+                            <th class="num">D</th>
+                            <th class="num">L</th>
+                            <th class="num">GF</th>
+                            <th class="num">GA</th>
+                            <th class="num">GD</th>
+                            <th class="num">Pts</th>
+                            <th class="num form">Form</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="entry : ${table.table}">
+                            <td class="num pos" th:text="${entry.position}">–</td>
+                            <td>
+                                <div class="team">
+                                    <img th:src="${entry.team.crest}" th:alt="${entry.team.name}" />
+                                    <span th:text="${entry.team.name}">–</span>
+                                </div>
+                            </td>
+                            <td class="num" th:text="${entry.playedGames}">–</td>
+                            <td class="num" th:text="${entry.won}">–</td>
+                            <td class="num" th:text="${entry.draw}">–</td>
+                            <td class="num" th:text="${entry.lost}">–</td>
+                            <td class="num" th:text="${entry.goalsFor}">–</td>
+                            <td class="num" th:text="${entry.goalsAgainst}">–</td>
+                            <td class="num" th:text="${entry.goalDifference}">–</td>
+                            <td class="num points" th:text="${entry.points}">–</td>
+                            <td class="num form" th:text="${entry.form != null} ? ${entry.form} : '–'">–</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+    </div>
+</body>
+</html>

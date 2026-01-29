@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+
+# IDE
+.idea
+*.iml
+.vscode/
+
+# Build
+demo/target/
+demo/.mvn/wrapper/maven-wrapper.jar
+
+# Local config (keep API key out of repo)
+demo/src/main/resources/application.properties
