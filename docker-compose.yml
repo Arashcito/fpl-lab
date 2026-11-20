@@ -10,6 +10,26 @@ services:
       - "5432:5432"
     volumes:
       - fpllab_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fpllab_user -d fpllab"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: fpllab-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/fpllab
+      DB_USER: fpllab_user
+      DB_PASSWORD: fpllab_pass
+      # Optional: put FOOTBALL_DATA_API_KEY=... in a .env file next to this one (never commit it)
+      FOOTBALL_DATA_API_KEY: ${FOOTBALL_DATA_API_KEY:-}
+    ports:
+      - "8080:8080"
 
 volumes:
   fpllab_data:
