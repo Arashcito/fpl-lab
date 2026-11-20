@@ -85,21 +85,9 @@ public class FplController {
         return fplService.getPlayerViews(teamId, positionId, sortBy, order, limit);
     }
 
-    @GetMapping("api/db/sync/teams")
-    public String syncTeams() {
-        int saved = fplService.syncTeamsToDB();
-        return "Saved: " + saved + " teams to DB";
-    }
-
-    @GetMapping("api/db/teams")
+    @GetMapping("/api/db/teams")
     public List<TeamEntity> dbTeams() {
         return fplService.getTeamsFromDb();
-    }
-
-    @GetMapping("/api/db/sync/players")
-    public String syncPlayers() {
-        int saved = fplService.syncPlayersToDb();
-        return "Saved " + saved + " players to DB ✅";
     }
 
     @GetMapping("/api/db/players")

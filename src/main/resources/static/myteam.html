@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPL Lab - My Team</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FPL Lab</h1>
+            <p>Your team, your move</p>
+            <nav class="nav">
+                <a href="myteam.html" class="active">My Team</a>
+                <a href="picks.html">Top Picks</a>
+                <a href="teams.html">League Table</a>
+                <a href="players.html">Players</a>
+            </nav>
+        </div>
+
+        <div class="content">
+            <form id="team-form" class="team-form">
+                <label>
+                    FPL team ID
+                    <input id="entry-id" type="number" min="1" required placeholder="e.g. 1234567">
+                </label>
+                <label>
+                    Plan ahead
+                    <select id="horizon">
+                        <option value="1">1 gameweek</option>
+                        <option value="2">2 gameweeks</option>
+                        <option value="3" selected>3 gameweeks</option>
+                        <option value="4">4 gameweeks</option>
+                        <option value="5">5 gameweeks</option>
+                        <option value="6">6 gameweeks</option>
+                    </select>
+                </label>
+                <label>
+                    Free transfers
+                    <select id="free-transfers">
+                        <option value="">Auto</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </label>
+                <button type="submit">Analyse</button>
+            </form>
+            <p class="hint">
+                Your team ID is the number in the address of your FPL "Points" page:
+                fantasy.premierleague.com/entry/<strong>1234567</strong>/event/10
+            </p>
+
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/projections.js"></script>
+    <script src="js/myteam.js"></script>
+</body>
+</html>
