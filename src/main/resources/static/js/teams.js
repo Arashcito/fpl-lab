@@ -9,10 +9,15 @@ async function loadStandings() {
             return;
         }
 
+        const showForm = standings.some(t => t.form);
+
         const rows = standings.map(t => `
             <tr class="${zoneClass(t.position, standings.length)}">
                 <td class="position">${t.position}</td>
-                <td class="team-name">${escapeHtml(t.name)}</td>
+                <td class="team-name">
+                    ${t.crest ? `<img class="crest" src="${escapeHtml(t.crest)}" alt="" loading="lazy">` : ""}
+                    ${escapeHtml(t.name)}
+                </td>
                 <td>${t.played}</td>
                 <td>${t.won}</td>
                 <td>${t.drawn}</td>
@@ -23,6 +28,7 @@ async function loadStandings() {
                     ${t.goalDifference > 0 ? "+" : ""}${t.goalDifference}
                 </td>
                 <td class="points">${t.points}</td>
+                ${showForm ? `<td class="form">${formBadges(t.form)}</td>` : ""}
             </tr>
         `).join("");
 
@@ -40,6 +46,7 @@ async function loadStandings() {
                         <th>GA</th>
                         <th>GD</th>
                         <th>Pts</th>
+                        ${showForm ? "<th>Form</th>" : ""}
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
@@ -49,6 +56,16 @@ async function loadStandings() {
         console.error("Error loading standings:", error);
         container.innerHTML = '<div class="error">Error loading standings. Please ensure the API is running.</div>';
     }
+}
+
+// football-data.org form looks like "W,D,L,W,W"
+function formBadges(form) {
+    if (!form) return "";
+    return form.split(",")
+        .map(r => r.trim())
+        .filter(r => ["W", "D", "L"].includes(r))
+        .map(r => `<span class="form-badge form-${r}">${r}</span>`)
+        .join("");
 }
 
 // Top 4: Champions League, 5th: Europa League, bottom 3: relegation

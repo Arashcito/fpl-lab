@@ -1,8 +1,11 @@
 package com.arash.fpllab.service;
 
+import com.arash.fpllab.client.FootballDataClient;
 import com.arash.fpllab.client.FplClient;
 import com.arash.fpllab.model.TeamWithStanding;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,23 +15,75 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builds the league table from FPL fixture results.
- * FPL's bootstrap-static "teams" block does not carry real standings
- * (points / wins / losses are always 0), so the table is calculated here.
+ * Provides the Premier League table.
+ * Primary source: football-data.org live standings (needs FOOTBALL_DATA_API_KEY).
+ * Fallback: calculated from FPL fixture results, because FPL's bootstrap-static
+ * "teams" block does not carry real standings (points / wins / losses are always 0).
  */
 @Service
 public class StandingsService {
 
-    private final FplClient fplClient;
+    private static final Logger logger = LoggerFactory.getLogger(StandingsService.class);
 
-    public StandingsService(FplClient fplClient) {
+    private final FplClient fplClient;
+    private final FootballDataClient footballDataClient;
+
+    public StandingsService(FplClient fplClient, FootballDataClient footballDataClient) {
         this.fplClient = fplClient;
+        this.footballDataClient = footballDataClient;
     }
 
     public List<TeamWithStanding> getStandings() {
+        if (footballDataClient.isConfigured()) {
+            try {
+                List<TeamWithStanding> live = fromFootballData(footballDataClient.getStandings());
+                if (!live.isEmpty()) {
+                    return live;
+                }
+                logger.warn("football-data.org returned no table; using FPL fixtures instead");
+            } catch (Exception e) {
+                logger.warn("football-data.org request failed ({}); using FPL fixtures instead", e.getMessage());
+            }
+        }
         JsonNode teams = fplClient.getBootstrapStatic().get("teams");
         JsonNode fixtures = fplClient.getFixtures();
         return calculate(teams, fixtures);
+    }
+
+    /**
+     * Maps the "TOTAL" table of a football-data.org standings response.
+     */
+    static List<TeamWithStanding> fromFootballData(JsonNode response) {
+        List<TeamWithStanding> table = new ArrayList<>();
+        if (response == null) {
+            return table;
+        }
+        for (JsonNode group : response.path("standings")) {
+            if (!"TOTAL".equals(group.path("type").asText())) {
+                continue;
+            }
+            for (JsonNode e : group.path("table")) {
+                JsonNode team = e.path("team");
+                table.add(new TeamWithStanding(
+                        e.path("position").asInt(),
+                        team.path("id").asInt(),
+                        team.path("shortName").asText(team.path("name").asText()),
+                        team.path("tla").asText(),
+                        e.path("playedGames").asInt(),
+                        e.path("won").asInt(),
+                        e.path("draw").asInt(),
+                        e.path("lost").asInt(),
+                        e.path("goalsFor").asInt(),
+                        e.path("goalsAgainst").asInt(),
+                        e.path("goalDifference").asInt(),
+                        e.path("points").asInt(),
+                        e.path("form").isTextual() ? e.path("form").asText() : null,
+                        team.path("crest").isTextual() ? team.path("crest").asText() : null
+                ));
+            }
+            break;
+        }
+        return table;
     }
 
     static List<TeamWithStanding> calculate(JsonNode teams, JsonNode fixtures) {
@@ -107,7 +162,7 @@ public class StandingsService {
         TeamWithStanding toStanding(int position) {
             return new TeamWithStanding(position, teamId, name, shortName,
                     won + drawn + lost, won, drawn, lost,
-                    goalsFor, goalsAgainst, goalDifference(), points());
+                    goalsFor, goalsAgainst, goalDifference(), points(), null, null);
         }
     }
 }

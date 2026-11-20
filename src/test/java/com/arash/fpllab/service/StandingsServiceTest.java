@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StandingsServiceTest {
 
@@ -82,5 +84,52 @@ class StandingsServiceTest {
 
     private JsonNode json(String s) throws Exception {
         return mapper.readTree(s);
+    }
+
+    @Test
+    void mapsFootballDataTotalTable() throws Exception {
+        String response = """
+                {
+                  "competition": {"code": "PL"},
+                  "standings": [
+                    {"type": "HOME", "table": [
+                      {"position": 1, "team": {"id": 99, "name": "Wrong FC"}, "points": 99}
+                    ]},
+                    {"type": "TOTAL", "table": [
+                      {"position": 1, "team": {"id": 57, "name": "Arsenal FC", "shortName": "Arsenal", "tla": "ARS",
+                                               "crest": "https://crests.football-data.org/57.png"},
+                       "playedGames": 12, "form": "W,W,D,W,L", "won": 8, "draw": 3, "lost": 1,
+                       "points": 27, "goalsFor": 22, "goalsAgainst": 7, "goalDifference": 15},
+                      {"position": 2, "team": {"id": 65, "name": "Manchester City FC", "shortName": "Man City", "tla": "MCI"},
+                       "playedGames": 12, "form": null, "won": 8, "draw": 1, "lost": 3,
+                       "points": 25, "goalsFor": 26, "goalsAgainst": 10, "goalDifference": 16}
+                    ]}
+                  ]
+                }
+                """;
+
+        List<TeamWithStanding> table = StandingsService.fromFootballData(json(response));
+
+        assertEquals(2, table.size());
+        TeamWithStanding first = table.get(0);
+        assertEquals(1, first.position());
+        assertEquals("Arsenal", first.name());
+        assertEquals("ARS", first.shortName());
+        assertEquals(12, first.played());
+        assertEquals(3, first.drawn());
+        assertEquals(27, first.points());
+        assertEquals(15, first.goalDifference());
+        assertEquals("W,W,D,W,L", first.form());
+        assertEquals("https://crests.football-data.org/57.png", first.crest());
+
+        assertEquals("Man City", table.get(1).name());
+        assertNull(table.get(1).form());
+        assertNull(table.get(1).crest());
+    }
+
+    @Test
+    void emptyFootballDataResponseGivesEmptyTable() throws Exception {
+        assertTrue(StandingsService.fromFootballData(json("{}")).isEmpty());
+        assertTrue(StandingsService.fromFootballData(null).isEmpty());
     }
 }

@@ -1,7 +1,8 @@
 package com.arash.fpllab.model;
 
 /**
- * One row of the Premier League table, calculated from finished fixtures.
+ * One row of the Premier League table.
+ * crest and form are only filled when the table comes from football-data.org.
  */
 public record TeamWithStanding(
         int position,
@@ -15,6 +16,8 @@ public record TeamWithStanding(
         int goalsFor,
         int goalsAgainst,
         int goalDifference,
-        int points
+        int points,
+        String form,
+        String crest
 ) {
 }

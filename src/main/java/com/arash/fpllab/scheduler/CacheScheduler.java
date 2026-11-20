@@ -33,14 +33,16 @@ public class CacheScheduler {
     }
 
     /**
-     * Clears the fixtures cache every 10 minutes so the league table
+     * Clears the league table caches every 2 minutes so the table
      * picks up new results on matchdays.
      */
-    @Scheduled(fixedRate = 10 * 60 * 1000)
-    public void clearFixturesCache() {
-        var cache = cacheManager.getCache("fixtures");
-        if (cache != null) {
-            cache.clear();
+    @Scheduled(fixedRate = 2 * 60 * 1000)
+    public void clearStandingsCaches() {
+        for (String name : new String[]{"fixtures", "liveStandings"}) {
+            var cache = cacheManager.getCache(name);
+            if (cache != null) {
+                cache.clear();
+            }
         }
     }
 }
