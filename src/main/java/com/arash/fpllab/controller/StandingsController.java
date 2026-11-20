@@ -1,6 +1,6 @@
 package com.arash.fpllab.controller;
 
-import com.arash.fpllab.model.Standing;
+import com.arash.fpllab.model.TeamWithStanding;
 import com.arash.fpllab.service.StandingsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +16,9 @@ public class StandingsController {
         this.standingsService = standingsService;
     }
 
-    @GetMapping("api/standings")
-    public List<Standing> getStandings() {
+    // example : http://localhost:8080/api/standings
+    @GetMapping("/api/standings")
+    public List<TeamWithStanding> getStandings() {
         return standingsService.getStandings();
     }
 }

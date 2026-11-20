@@ -31,5 +31,17 @@ public class CacheScheduler {
             logger.warn("Bootstrap cache not found in CacheManager");
         }
     }
+
+    /**
+     * Clears the fixtures cache every 10 minutes so the league table
+     * picks up new results on matchdays.
+     */
+    @Scheduled(fixedRate = 10 * 60 * 1000)
+    public void clearFixturesCache() {
+        var cache = cacheManager.getCache("fixtures");
+        if (cache != null) {
+            cache.clear();
+        }
+    }
 }
 

@@ -11,7 +11,6 @@ import com.arash.fpllab.model.Gameweek;
 import com.arash.fpllab.model.Player;
 import com.arash.fpllab.model.Position;
 import com.arash.fpllab.model.Team;
-import com.arash.fpllab.model.TeamWithStanding;
 import com.arash.fpllab.repository.PlayerRepository;
 import com.arash.fpllab.repository.TeamRepository;
 import org.springframework.data.domain.PageRequest;
@@ -429,52 +428,6 @@ public class FplService {
         }
 
         return result;
-    }
-
-    public List<TeamWithStanding> getTeamsWithStandings() {
-        JsonNode root = fplClient.getBootstrapStatic();
-        JsonNode teamsNode = root.get("teams");
-
-        List<TeamWithStanding> teams = new ArrayList<>();
-
-        for (JsonNode team : teamsNode) {
-            int points = team.has("points") ? team.get("points").asInt() : 0;
-            int position = team.has("position") ? team.get("position").asInt() : 0;
-            int wins = team.has("win") ? team.get("win").asInt() : 0;
-            int draws = team.has("draw") ? team.get("draw").asInt() : 0;
-            int losses = team.has("loss") ? team.get("loss").asInt() : 0;
-            int played = team.has("played") ? team.get("played").asInt() : (wins + draws + losses);
-            int goalsFor = team.has("strength_attack_home") ? team.get("strength_attack_home").asInt() : 0;
-            int goalsAgainst = team.has("strength_defence_home") ? team.get("strength_defence_home").asInt() : 0;
-            int goalDiff = goalsFor - goalsAgainst;
-
-            teams.add(new TeamWithStanding(
-                    team.get("id").asInt(),
-                    team.get("name").asText(),
-                    points,
-                    position,
-                    wins,
-                    draws,
-                    losses,
-                    goalsFor,
-                    goalsAgainst,
-                    goalDiff
-            ));
-        }
-
-        // Sort by points (descending), then by goal difference
-        teams.sort((a, b) -> {
-            int pointsCompare = Integer.compare(b.getPoints(), a.getPoints());
-            if (pointsCompare != 0) return pointsCompare;
-            return Integer.compare(b.getGoalDifference(), a.getGoalDifference());
-        });
-
-        // Update position based on sorted order
-        for (int i = 0; i < teams.size(); i++) {
-            // Position will be set by frontend based on index
-        }
-
-        return teams;
     }
 
 }

@@ -30,4 +30,13 @@ public class FplClient {
                 .body(JsonNode.class);
     }
 
+    // All season fixtures with scores; used to build the league table.
+    @Cacheable("fixtures")
+    public JsonNode getFixtures() {
+        return restClient.get()
+                .uri("/fixtures/")
+                .retrieve()
+                .body(JsonNode.class);
+    }
+
 }
