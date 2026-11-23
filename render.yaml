@@ -1,0 +1,23 @@
+# Render blueprint: https://render.com/docs/blueprint-spec
+# Free web service built from the Dockerfile. The database is on Neon (free, never expires).
+services:
+  - type: web
+    name: fpl-lab
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # From your Neon dashboard (see docs/deploy.md). Entered in Render, never committed.
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Random secret Render creates; copy it into cron-job.org
+      - key: SYNC_TOKEN
+        generateValue: true
+      # Optional: live league table
+      - key: FOOTBALL_DATA_API_KEY
+        sync: false

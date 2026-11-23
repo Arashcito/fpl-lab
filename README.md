@@ -30,6 +30,10 @@ Without Docker, start Postgres (`docker compose up db`) and run:
 
 Optional live league table: get a free key at https://www.football-data.org/client/register and put `FOOTBALL_DATA_API_KEY=your-key` in a `.env` file next to `docker-compose.yml` (it is git-ignored).
 
+## Put it online (free)
+
+Render (app) + Neon (database) + cron-job.org (scheduler), all free with no credit card. Step-by-step: [docs/deploy.md](docs/deploy.md).
+
 ## API
 
 | Endpoint | Description |
@@ -38,7 +42,7 @@ Optional live league table: get a free key at https://www.football-data.org/clie
 | `GET /api/projections?horizon=3&position=MID&limit=50` | Expected points per player per gameweek |
 | `GET /api/accuracy` | Predicted vs. actual points per gameweek, FPL Lab vs. FPL official |
 | `GET /api/standings` | Premier League table |
-| `POST /api/sync` | Sync FPL data into the database now (also runs on startup and every 30 minutes) |
+| `POST /api/sync` | Sync FPL data into the database now (also runs on startup and every 30 minutes). Needs `X-Sync-Token` or `?token=` when `SYNC_TOKEN` is set |
 
 ## Tech
 

@@ -15,4 +15,6 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
+# Fits the 512 MB free plan: heap up to 70% of the container, small thread stacks, a lean garbage collector
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=70 -Xss512k -XX:+UseSerialGC -XX:TieredStopAtLevel=1"
+ENTRYPOINT ["sh","-c","exec java $JAVA_OPTS -jar app.jar"]
