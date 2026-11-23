@@ -23,7 +23,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DB_URL: jdbc:postgresql://db:5432/fpllab
+      DB_URL: jdbc:postgresql://db:5432/fpllab?reWriteBatchedInserts=true
       DB_USER: fpllab_user
       DB_PASSWORD: fpllab_pass
       # Optional: put FOOTBALL_DATA_API_KEY=... in a .env file next to this one (never commit it)

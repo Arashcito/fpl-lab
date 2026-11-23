@@ -15,7 +15,7 @@ class NeonEnvironmentTest {
     void convertsNeonUrlToJdbc() {
         var props = NeonEnvironment.toSpringDatasource(
                 "postgresql://neondb_owner:p%40ss@ep-x-123.c-1.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require");
-        assertEquals("jdbc:postgresql://ep-x-123.c-1.us-east-1.aws.neon.tech/neondb?sslmode=require",
+        assertEquals("jdbc:postgresql://ep-x-123.c-1.us-east-1.aws.neon.tech/neondb?sslmode=require&reWriteBatchedInserts=true",
                 props.get("spring.datasource.url"));
         assertEquals("neondb_owner", props.get("spring.datasource.username"));
         assertEquals("p@ss", props.get("spring.datasource.password"));   // URL-encoded characters decoded
@@ -24,7 +24,7 @@ class NeonEnvironmentTest {
     @Test
     void addsSslWhenMissingAndKeepsPort() {
         var props = NeonEnvironment.toSpringDatasource("postgres://u:p@host:6543/db");
-        assertEquals("jdbc:postgresql://host:6543/db?sslmode=require", props.get("spring.datasource.url"));
+        assertEquals("jdbc:postgresql://host:6543/db?sslmode=require&reWriteBatchedInserts=true", props.get("spring.datasource.url"));
     }
 
     @Test

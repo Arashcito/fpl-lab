@@ -4,6 +4,7 @@ import com.arash.fpllab.entity.GameweekEntity;
 import com.arash.fpllab.entity.PlayerEntity;
 import com.arash.fpllab.entity.PlayerGameweekEntity;
 import com.arash.fpllab.entity.PredictionSnapshotEntity;
+import com.arash.fpllab.repository.BulkWriter;
 import com.arash.fpllab.repository.GameweekRepository;
 import com.arash.fpllab.repository.PlayerGameweekRepository;
 import com.arash.fpllab.repository.PlayerRepository;
@@ -48,11 +49,12 @@ public class AccuracyService {
     private final PlayerGameweekRepository playerGameweekRepository;
     private final ArchiveService archiveService;
     private final ObjectMapper objectMapper;
+    private final BulkWriter bulkWriter;
 
     public AccuracyService(PredictionService predictionService, PredictionSnapshotRepository snapshotRepository,
                            GameweekRepository gameweekRepository, PlayerRepository playerRepository,
                            PlayerGameweekRepository playerGameweekRepository, ArchiveService archiveService,
-                           ObjectMapper objectMapper) {
+                           ObjectMapper objectMapper, BulkWriter bulkWriter) {
         this.predictionService = predictionService;
         this.snapshotRepository = snapshotRepository;
         this.gameweekRepository = gameweekRepository;
@@ -60,6 +62,7 @@ public class AccuracyService {
         this.playerGameweekRepository = playerGameweekRepository;
         this.archiveService = archiveService;
         this.objectMapper = objectMapper;
+        this.bulkWriter = bulkWriter;
     }
 
     // ---- 1. saving predictions ----
@@ -93,7 +96,7 @@ public class AccuracyService {
                         p.getFplExpectedPoints(), now));
             }
         }
-        snapshotRepository.saveAll(rows);
+        bulkWriter.upsertSnapshots(rows);
         logger.info("Saved {} predictions for GW{}", rows.size(), gw.getId());
         archivePredictions(gw.getId(), now, projections);
         return rows.size();

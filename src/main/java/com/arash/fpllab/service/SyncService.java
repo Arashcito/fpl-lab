@@ -7,6 +7,7 @@ import com.arash.fpllab.entity.PlayerEntity;
 import com.arash.fpllab.entity.PlayerGameweekEntity;
 import com.arash.fpllab.entity.TeamEntity;
 import com.arash.fpllab.prediction.AccuracyService;
+import com.arash.fpllab.repository.BulkWriter;
 import com.arash.fpllab.repository.FixtureRepository;
 import com.arash.fpllab.repository.GameweekRepository;
 import com.arash.fpllab.repository.PlayerGameweekRepository;
@@ -45,6 +46,7 @@ public class SyncService {
     private final PlayerGameweekRepository playerGameweekRepository;
     private final CacheManager cacheManager;
     private final AccuracyService accuracyService;
+    private final BulkWriter bulkWriter;
     private final boolean syncOnStartup;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private volatile Instant lastSync;
@@ -57,6 +59,7 @@ public class SyncService {
                        PlayerGameweekRepository playerGameweekRepository,
                        CacheManager cacheManager,
                        AccuracyService accuracyService,
+                       BulkWriter bulkWriter,
                        @Value("${fpl.sync.on-startup:true}") boolean syncOnStartup) {
         this.fplClient = fplClient;
         this.teamRepository = teamRepository;
@@ -66,6 +69,7 @@ public class SyncService {
         this.playerGameweekRepository = playerGameweekRepository;
         this.cacheManager = cacheManager;
         this.accuracyService = accuracyService;
+        this.bulkWriter = bulkWriter;
         this.syncOnStartup = syncOnStartup;
     }
 
@@ -172,7 +176,7 @@ public class SyncService {
             e.setFplExpectedPoints(p.path("ep_next").isNull() ? null : p.path("ep_next").asDouble());
             players.add(e);
         }
-        playerRepository.saveAll(players);
+        bulkWriter.upsertPlayers(players);
         return players.size();
     }
 
@@ -210,7 +214,7 @@ public class SyncService {
             e.setFinished(f.path("finished").asBoolean() || f.path("finished_provisional").asBoolean());
             fixtures.add(e);
         }
-        fixtureRepository.saveAll(fixtures);
+        bulkWriter.upsertFixtures(fixtures);
         return fixtures.size();
     }
 
@@ -260,7 +264,7 @@ public class SyncService {
             r.setTotalPoints(s.path("total_points").asInt());
             rows.add(r);
         }
-        playerGameweekRepository.saveAll(rows);
+        bulkWriter.upsertPlayerGameweeks(rows);
     }
 
     // Sums the FPL points awarded for one stat across a gameweek's matches.

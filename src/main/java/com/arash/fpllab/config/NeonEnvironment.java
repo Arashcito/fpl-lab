@@ -80,7 +80,7 @@ public class NeonEnvironment implements EnvironmentPostProcessor {
     /** Keeps sslmode; drops libpq-only options the JDBC driver doesn't understand (e.g. channel_binding). */
     private static String jdbcQuery(String rawQuery) {
         if (rawQuery == null || rawQuery.isBlank()) {
-            return "sslmode=require";
+            return "sslmode=require&reWriteBatchedInserts=true";
         }
         StringBuilder sb = new StringBuilder();
         for (String part : rawQuery.split("&")) {
@@ -92,6 +92,10 @@ public class NeonEnvironment implements EnvironmentPostProcessor {
         }
         if (!sb.toString().contains("sslmode=")) {
             sb.append(sb.isEmpty() ? "" : "&").append("sslmode=require");
+        }
+        // lets the driver send batched inserts as multi-row statements (far fewer round trips)
+        if (!sb.toString().contains("reWriteBatchedInserts=")) {
+            sb.append("&reWriteBatchedInserts=true");
         }
         return sb.toString();
     }
