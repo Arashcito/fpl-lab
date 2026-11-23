@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPL Lab - Accuracy</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FPL Lab</h1>
+            <p>How good are the predictions?</p>
+            <nav class="nav">
+                <a href="myteam.html">My Team</a>
+                <a href="picks.html">Top Picks</a>
+                <a href="accuracy.html" class="active">Accuracy</a>
+                <a href="teams.html">League Table</a>
+                <a href="players.html">Players</a>
+            </nav>
+        </div>
+
+        <div class="content">
+            <p class="hint">
+                Before every deadline FPL Lab saves its predicted points for every player, next to FPL's own
+                official estimate. After the gameweek both are compared with what really happened.
+            </p>
+            <div id="accuracy"><div class="loading">Loading...</div></div>
+
+            <details class="alternatives explain">
+                <summary>What do these numbers mean?</summary>
+                <ul class="reasons">
+                    <li><strong>Average error</strong>: how far off a prediction is, on average, for players who played.
+                        Lower is better. FPL points are very random, so even a good model is about 2 points off.</li>
+                    <li><strong>Ranking</strong>: does the model put players in the right order? 1.00 = perfect order,
+                        0 = random. This matters most for picking players.</li>
+                    <li><strong>Top 10 picks</strong>: average real points of the 10 players the model rated highest.
+                        Higher is better. This is what you would have got by trusting it.</li>
+                    <li><strong>Captain</strong>: the single highest-predicted player, and what he actually scored.</li>
+                    <li><strong>Bias</strong>: above 0 means the model was too optimistic, below 0 too pessimistic.</li>
+                </ul>
+            </details>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/projections.js"></script>
+    <script src="js/accuracy.js"></script>
+</body>
+</html>

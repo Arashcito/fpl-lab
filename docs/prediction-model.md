@@ -177,7 +177,28 @@ net gain = value(new squad) − value(current squad) − 4 × (transfers beyond 
 
 ---
 
-## 9. Known limitations (and what the ML model should improve)
+## 9. Measuring accuracy
+
+Before every deadline (after each 30-minute sync, until the deadline passes) FPL Lab saves the next-gameweek prediction of every player from two models:
+
+- **fpl-lab**: this model
+- **fpl-official**: FPL's own `ep_next` estimate, as a benchmark
+
+Once the gameweek is played, both are compared with the real points (`/accuracy.html`, `/api/accuracy`). Only players who played at least one minute count for error and ranking.
+
+| Metric | Formula | Better |
+|---|---|---|
+| Average error (MAE) | `mean |predicted − actual|` | lower |
+| Bias | `mean (predicted − actual)` | close to 0 |
+| Ranking (Spearman) | correlation of the predicted order with the real order (ties share their average rank) | closer to 1 |
+| Top 10 picks | average real points of the 10 highest-predicted players | higher |
+| Captain | real points of the single highest-predicted player | higher |
+
+A future ML model is added as a third model name and judged on exactly the same numbers.
+
+Note: predictions are only saved while the app is running before a deadline, so past gameweeks can't be scored retroactively (that would use information from after the deadline).
+
+## 10. Known limitations (and what the ML model should improve)
 
 - Bonus and defensive contributions don't depend on the opponent.
 - Home/away factors are fixed league-wide values, not per team.

@@ -6,6 +6,7 @@ import com.arash.fpllab.entity.GameweekEntity;
 import com.arash.fpllab.entity.PlayerEntity;
 import com.arash.fpllab.entity.PlayerGameweekEntity;
 import com.arash.fpllab.entity.TeamEntity;
+import com.arash.fpllab.prediction.AccuracyService;
 import com.arash.fpllab.repository.FixtureRepository;
 import com.arash.fpllab.repository.GameweekRepository;
 import com.arash.fpllab.repository.PlayerGameweekRepository;
@@ -43,6 +44,7 @@ public class SyncService {
     private final FixtureRepository fixtureRepository;
     private final PlayerGameweekRepository playerGameweekRepository;
     private final CacheManager cacheManager;
+    private final AccuracyService accuracyService;
     private final boolean syncOnStartup;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private volatile Instant lastSync;
@@ -54,6 +56,7 @@ public class SyncService {
                        FixtureRepository fixtureRepository,
                        PlayerGameweekRepository playerGameweekRepository,
                        CacheManager cacheManager,
+                       AccuracyService accuracyService,
                        @Value("${fpl.sync.on-startup:true}") boolean syncOnStartup) {
         this.fplClient = fplClient;
         this.teamRepository = teamRepository;
@@ -62,6 +65,7 @@ public class SyncService {
         this.fixtureRepository = fixtureRepository;
         this.playerGameweekRepository = playerGameweekRepository;
         this.cacheManager = cacheManager;
+        this.accuracyService = accuracyService;
         this.syncOnStartup = syncOnStartup;
     }
 
@@ -106,6 +110,7 @@ public class SyncService {
             int gameweeksSynced = syncPlayerGameweeks(gameweeks);
 
             evict("projections");
+            snapshotPredictions();
             lastSync = Instant.now();
             SyncResult result = new SyncResult(teams, players, fixtures, gameweeksSynced,
                     System.currentTimeMillis() - start, lastSync);
@@ -113,6 +118,15 @@ public class SyncService {
             return result;
         } finally {
             running.set(false);
+        }
+    }
+
+    // Saves predictions for the next deadline; a failure here must not break the sync itself.
+    private void snapshotPredictions() {
+        try {
+            accuracyService.snapshotNextGameweek();
+        } catch (Exception e) {
+            logger.warn("Could not save predictions for the accuracy page", e);
         }
     }
 
@@ -155,6 +169,7 @@ public class SyncService {
             e.setPenaltiesOrder(intOrNull(p.get("penalties_order")));
             e.setForm(p.path("form").asDouble());
             e.setSelectedByPercent(p.path("selected_by_percent").asDouble());
+            e.setFplExpectedPoints(p.path("ep_next").isNull() ? null : p.path("ep_next").asDouble());
             players.add(e);
         }
         playerRepository.saveAll(players);

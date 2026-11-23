@@ -536,8 +536,23 @@ body {
     border-bottom: 1px dotted #ebe1d1;
 }
 
+.stats-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.stat-value .vs {
+    font-size: 0.55em;
+    color: #41644a;
+    font-weight: normal;
+}
+
+.explain {
+    margin-top: 24px;
+}
+
 @media (max-width: 768px) {
-    .stats {
+    .stats,
+    .stats-4 {
         grid-template-columns: 1fr;
     }
     

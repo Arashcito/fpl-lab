@@ -8,6 +8,7 @@
 - **Captain picks:** your XI ranked by expected points for the next gameweek.
 - **Fixture heatmap:** expected points for every squad player in each of the next 1–6 gameweeks.
 - **Top Picks:** the best players by expected points, filterable by position and price.
+- **Accuracy:** before every deadline the predictions are saved, then compared with real points and with FPL's own official estimate.
 - **League table:** live from football-data.org, or calculated from FPL results when no API key is set.
 - **Transparent model:** click any player to see exactly where their points come from. All formulas are in [docs/prediction-model.md](docs/prediction-model.md).
 
@@ -35,6 +36,7 @@ Optional live league table: get a free key at https://www.football-data.org/clie
 |---|---|
 | `GET /api/my-team/{teamId}?horizon=3&freeTransfers=` | Transfer and captain advice for an FPL team |
 | `GET /api/projections?horizon=3&position=MID&limit=50` | Expected points per player per gameweek |
+| `GET /api/accuracy` | Predicted vs. actual points per gameweek, FPL Lab vs. FPL official |
 | `GET /api/standings` | Premier League table |
 | `POST /api/sync` | Sync FPL data into the database now (also runs on startup and every 30 minutes) |
 
@@ -44,6 +46,5 @@ Java 21, Spring Boot 3, PostgreSQL, plain HTML/CSS/JS front end, JUnit tests (`.
 
 ## Roadmap
 
-- Accuracy page: predicted vs. actual points after every gameweek
 - Mini-league rival comparison
 - Python ML model to replace the formula-based projections

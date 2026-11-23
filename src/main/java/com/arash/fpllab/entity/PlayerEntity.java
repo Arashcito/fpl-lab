@@ -40,6 +40,7 @@ public class PlayerEntity {
     private Integer penaltiesOrder;    // 1 = first-choice penalty taker
     private Double form;
     private Double selectedByPercent;
+    private Double fplExpectedPoints;  // FPL's own "ep_next" estimate for the next gameweek
 
     public PlayerEntity() {}
 
@@ -117,4 +118,7 @@ public class PlayerEntity {
 
     public Double getSelectedByPercent() { return selectedByPercent; }
     public void setSelectedByPercent(Double selectedByPercent) { this.selectedByPercent = selectedByPercent; }
+
+    public Double getFplExpectedPoints() { return fplExpectedPoints; }
+    public void setFplExpectedPoints(Double fplExpectedPoints) { this.fplExpectedPoints = fplExpectedPoints; }
 }

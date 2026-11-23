@@ -13,4 +13,6 @@ public interface PlayerGameweekRepository extends JpaRepository<PlayerGameweekEn
     Set<Integer> findSyncedEvents();
 
     List<PlayerGameweekEntity> findByEventGreaterThanEqual(Integer event);
+
+    List<PlayerGameweekEntity> findByEvent(Integer event);
 }
