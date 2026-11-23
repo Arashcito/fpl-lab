@@ -4,3 +4,7 @@ target
 .vscode
 .DS_Store
 *.iml
+node_modules
+.env
+.env.*
+.neon

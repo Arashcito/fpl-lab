@@ -1,19 +1,26 @@
 # Render blueprint: https://render.com/docs/blueprint-spec
-# Free web service built from the Dockerfile. The database is on Neon (free, never expires).
+# Free web service built from the Dockerfile. Database and file storage are on Neon
+# (project sweet-lake-09465108, branch "production"); copy the values from .env.local.
 services:
   - type: web
     name: fpl-lab
     runtime: docker
     plan: free
+    region: virginia   # same region as the Neon project (aws us-east-1)
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
-      # From your Neon dashboard (see docs/deploy.md). Entered in Render, never committed.
-      - key: DB_URL
+      # Neon Postgres: the direct connection string (the app converts it to JDBC itself)
+      - key: DATABASE_URL_UNPOOLED
         sync: false
-      - key: DB_USER
+      # Neon Object Storage (S3-compatible), bucket "assets"
+      - key: AWS_ENDPOINT_URL_S3
         sync: false
-      - key: DB_PASSWORD
+      - key: AWS_REGION
+        value: us-east-1
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
         sync: false
       # Random secret Render creates; copy it into cron-job.org
       - key: SYNC_TOKEN

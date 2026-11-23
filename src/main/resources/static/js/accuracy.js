@@ -63,7 +63,8 @@ function gameweekTable(gws) {
     const rows = gws.map(g => {
         if (!g.fplLab) {
             return `<tr><td class="position">GW${g.event}</td><td>${escapeHtml(g.status)}</td>
-                <td colspan="5" class="sub">Predictions saved, waiting for the matches</td></tr>`;
+                <td colspan="5" class="sub">Predictions saved, waiting for the matches ·
+                    <a href="/api/accuracy/${g.event}/download">download JSON</a></td></tr>`;
         }
         const lab = g.fplLab, off = g.fplOfficial || {};
         const win = (a, b, lower) => (a == null || b == null) ? "" : ((lower ? a < b : a > b) ? "positive" : "");
@@ -107,7 +108,8 @@ async function toggleDetail(row) {
                 <div><h4>Top predictions</h4>${playerList(d.topPredicted)}</div>
                 <div><h4>Biggest over-predictions</h4>${playerList(d.overPredicted)}</div>
                 <div><h4>Biggest under-predictions</h4>${playerList(d.underPredicted)}</div>
-            </div>`;
+            </div>
+            <p class="hint"><a href="/api/accuracy/${row.dataset.event}/download">Download all GW${row.dataset.event} predictions (JSON)</a></p>`;
         detailRow.dataset.loaded = "1";
     } catch (e) {
         detailRow.firstElementChild.innerHTML = '<div class="error">Could not load details.</div>';

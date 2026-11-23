@@ -32,7 +32,7 @@ Optional live league table: get a free key at https://www.football-data.org/clie
 
 ## Put it online (free)
 
-Render (app) + Neon (database) + cron-job.org (scheduler), all free with no credit card. Step-by-step: [docs/deploy.md](docs/deploy.md).
+Render (app) + Neon (Postgres and object storage) + cron-job.org (scheduler), all free with no credit card. Step-by-step: [docs/deploy.md](docs/deploy.md).
 
 ## API
 
@@ -41,12 +41,13 @@ Render (app) + Neon (database) + cron-job.org (scheduler), all free with no cred
 | `GET /api/my-team/{teamId}?horizon=3&freeTransfers=` | Transfer and captain advice for an FPL team |
 | `GET /api/projections?horizon=3&position=MID&limit=50` | Expected points per player per gameweek |
 | `GET /api/accuracy` | Predicted vs. actual points per gameweek, FPL Lab vs. FPL official |
+| `GET /api/accuracy/{gw}/download` | That gameweek's saved predictions as JSON (signed link to Neon Object Storage) |
 | `GET /api/standings` | Premier League table |
 | `POST /api/sync` | Sync FPL data into the database now (also runs on startup and every 30 minutes). Needs `X-Sync-Token` or `?token=` when `SYNC_TOKEN` is set |
 
 ## Tech
 
-Java 21, Spring Boot 3, PostgreSQL, plain HTML/CSS/JS front end, JUnit tests (`./mvnw test` runs on an in-memory database, no setup needed).
+Java 21, Spring Boot 3, PostgreSQL on Neon, Neon Object Storage (via the AWS S3 SDK), plain HTML/CSS/JS front end, JUnit tests (`./mvnw test` runs on an in-memory database, no setup needed).
 
 ## Roadmap
 

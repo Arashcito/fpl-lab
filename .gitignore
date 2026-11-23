@@ -31,6 +31,10 @@ build/
 
 # Local config / secrets
 .env
+.env.local
+.env.*.local
 
 # Spring
 HELP.md
+.neon
+node_modules/

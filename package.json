@@ -1,0 +1,12 @@
+{
+  "name": "fpl-lab",
+  "private": true,
+  "description": "Neon tooling for FPL Lab (the app itself is Java/Spring Boot, built with Maven)",
+  "scripts": {
+    "build": "if command -v mvn >/dev/null; then mvn -q package; else ./mvnw -q package; fi"
+  },
+  "dependencies": {
+    "@neon/config": "^1.14.6",
+    "@neon/env": "^2.1.9"
+  }
+}

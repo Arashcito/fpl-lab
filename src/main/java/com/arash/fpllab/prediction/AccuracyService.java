@@ -8,6 +8,8 @@ import com.arash.fpllab.repository.GameweekRepository;
 import com.arash.fpllab.repository.PlayerGameweekRepository;
 import com.arash.fpllab.repository.PlayerRepository;
 import com.arash.fpllab.repository.PredictionSnapshotRepository;
+import com.arash.fpllab.storage.ArchiveService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -44,15 +46,20 @@ public class AccuracyService {
     private final GameweekRepository gameweekRepository;
     private final PlayerRepository playerRepository;
     private final PlayerGameweekRepository playerGameweekRepository;
+    private final ArchiveService archiveService;
+    private final ObjectMapper objectMapper;
 
     public AccuracyService(PredictionService predictionService, PredictionSnapshotRepository snapshotRepository,
                            GameweekRepository gameweekRepository, PlayerRepository playerRepository,
-                           PlayerGameweekRepository playerGameweekRepository) {
+                           PlayerGameweekRepository playerGameweekRepository, ArchiveService archiveService,
+                           ObjectMapper objectMapper) {
         this.predictionService = predictionService;
         this.snapshotRepository = snapshotRepository;
         this.gameweekRepository = gameweekRepository;
         this.playerRepository = playerRepository;
         this.playerGameweekRepository = playerGameweekRepository;
+        this.archiveService = archiveService;
+        this.objectMapper = objectMapper;
     }
 
     // ---- 1. saving predictions ----
@@ -88,7 +95,37 @@ public class AccuracyService {
         }
         snapshotRepository.saveAll(rows);
         logger.info("Saved {} predictions for GW{}", rows.size(), gw.getId());
+        archivePredictions(gw.getId(), now, projections);
         return rows.size();
+    }
+
+    /** One JSON file per gameweek in object storage; overwritten until the deadline, then final. */
+    public record ArchivedPlayer(int id, String name, String team, String position, double price,
+                                 double fplLab, Double fplOfficial) {}
+
+    public record ArchivedPredictions(int event, Instant savedAt, List<String> models, List<ArchivedPlayer> players) {}
+
+    private void archivePredictions(int event, Instant savedAt, Projection.Set projections) {
+        if (!archiveService.isEnabled()) {
+            return;
+        }
+        try {
+            Map<Integer, PlayerEntity> players = playersById();
+            List<ArchivedPlayer> list = projections.players().values().stream()
+                    .sorted(Comparator.comparingDouble((Projection.Player p) -> p.pointsIn(0)).reversed())
+                    .map(p -> new ArchivedPlayer(p.id(), p.name(), p.team(), p.position(), p.price(),
+                            p.pointsIn(0), players.containsKey(p.id()) ? players.get(p.id()).getFplExpectedPoints() : null))
+                    .toList();
+            var archive = new ArchivedPredictions(event, savedAt, List.of(MODEL_FPL_LAB, MODEL_FPL_OFFICIAL), list);
+            archiveService.putJson(ArchiveService.predictionsKey(event), objectMapper.writeValueAsString(archive));
+        } catch (Exception e) {
+            logger.warn("Could not archive GW{} predictions to object storage", event, e);
+        }
+    }
+
+    /** Short-lived link to download a gameweek's archived predictions, if storage has them. */
+    public java.util.Optional<String> predictionsDownloadLink(int event) {
+        return archiveService.downloadLink(ArchiveService.predictionsKey(event));
     }
 
     // ---- 2. scoring ----
