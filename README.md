@@ -2,6 +2,12 @@
 
 **Your team, your move.** Enter your Fantasy Premier League team ID and FPL Lab tells you which transfers to make, who to captain and why, based on expected points for the next few gameweeks.
 
+**Live:** https://fpl-lab-atan.onrender.com (free hosting: the first visit after a quiet spell takes about a minute to wake up)
+
+![My Team: transfer advice and captain picks](docs/images/my-team.png)
+
+![Top Picks: expected points per gameweek, with the breakdown for one player](docs/images/top-picks.png)
+
 ## Features
 
 - **My Team:** loads your squad, bank and free transfers, then recommends 0, 1 or 2 transfers (within budget, max 3 per club, counting −4 hits). Each suggestion comes with its reasons.
