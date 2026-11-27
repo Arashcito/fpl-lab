@@ -44,8 +44,8 @@ class AccuracyServiceTest {
     void overallOnlyCountsFinishedGameweeks() {
         var labGood = new AccuracyService.Score("fpl-lab", 300, 1.8, 0.1, 0.4, 6.0, 1, "A", 7, 12);
         var officialWorse = new AccuracyService.Score("fpl-official", 300, 2.2, 0.5, 0.3, 4.0, 2, "B", 8, 2);
-        var finished = new AccuracyService.GameweekSummary(10, "finished", null, labGood, officialWorse, 1, "A", 12);
-        var inProgress = new AccuracyService.GameweekSummary(11, "in progress", null, officialWorse, labGood, 1, "A", 5);
+        var finished = new AccuracyService.GameweekSummary(10, "finished", null, labGood, null, officialWorse, 1, "A", 12);
+        var inProgress = new AccuracyService.GameweekSummary(11, "in progress", null, officialWorse, null, labGood, 1, "A", 5);
 
         var overall = AccuracyService.overall(List.of(finished, inProgress));
 
@@ -53,6 +53,27 @@ class AccuracyServiceTest {
         assertEquals(1.8, overall.fplLabError(), EPS);
         assertEquals(2.2, overall.fplOfficialError(), EPS);
         assertEquals(1, overall.fplLabWins());
+        assertEquals(0, overall.fplOfficialWins());
+        assertEquals(0, overall.mlGameweeksScored());
+        assertNull(overall.fplLabMlError());
+    }
+
+    @Test
+    void mlModelIsScoredOnItsOwnGameweeksAndCanWin() {
+        var lab = new AccuracyService.Score("fpl-lab", 300, 2.0, 0, 0.3, 5.0, 1, "A", 6, 2);
+        var official = new AccuracyService.Score("fpl-official", 300, 2.2, 0, 0.3, 4.0, 2, "B", 7, 3);
+        var ml = new AccuracyService.Score("fpl-lab-ml", 300, 1.9, 0, 0.35, 6.0, 3, "C", 5, 9);
+        var beforeMl = new AccuracyService.GameweekSummary(9, "finished", null, lab, null, official, 1, "A", 10);
+        var withMl = new AccuracyService.GameweekSummary(10, "finished", null, lab, ml, official, 1, "A", 10);
+
+        var overall = AccuracyService.overall(List.of(withMl, beforeMl));
+
+        assertEquals(2, overall.gameweeksScored());
+        assertEquals(1, overall.mlGameweeksScored());
+        assertEquals(1.9, overall.fplLabMlError(), EPS);
+        assertEquals(6.0, overall.fplLabMlTopPicks(), EPS);
+        assertEquals(1, overall.fplLabMlWins());   // GW10: ML has the lowest error
+        assertEquals(1, overall.fplLabWins());     // GW9: no ML yet, the formula beats FPL
         assertEquals(0, overall.fplOfficialWins());
     }
 

@@ -21,6 +21,8 @@ public class PredictionSnapshotEntity {
     public static final String MODEL_FPL_LAB = "fpl-lab";
     /** FPL's own "expected points" (ep_next), used as a benchmark. */
     public static final String MODEL_FPL_OFFICIAL = "fpl-official";
+    /** The machine-learning model (Python, ml/), read from the ml_predictions table. */
+    public static final String MODEL_FPL_LAB_ML = "fpl-lab-ml";
 
     // "<model>-<event>-<playerId>", so re-saving before the deadline overwrites the same row
     @Id

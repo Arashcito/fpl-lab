@@ -22,8 +22,10 @@
 
         <div class="content">
             <p class="hint">
-                Before every deadline FPL Lab saves its predicted points for every player, next to FPL's own
-                official estimate. After the gameweek both are compared with what really happened.
+                Before every deadline FPL Lab saves every player's predicted points from three models: the
+                <strong>formula</strong> (hand-written rules), the <strong>ML model</strong> (LightGBM trained on five
+                seasons of history) and <strong>FPL's own official estimate</strong>. After the gameweek all three are
+                compared with what really happened.
             </p>
             <div id="accuracy"><div class="loading">Loading...</div></div>
 

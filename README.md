@@ -16,6 +16,7 @@
 - **Top Picks:** the best players by expected points, filterable by position and price.
 - **Accuracy:** before every deadline the predictions are saved, then compared with real points and with FPL's own official estimate.
 - **League table:** live from football-data.org, or calculated from FPL results when no API key is set.
+- **Machine-learning model:** a LightGBM model trained on five seasons of match data predicts every player's points; the Accuracy page compares it with the formula and FPL's own estimate. See [ml/README.md](ml/README.md).
 - **Transparent model:** click any player to see exactly where their points come from. All formulas are in [docs/prediction-model.md](docs/prediction-model.md).
 
 ## Run it
@@ -53,9 +54,10 @@ Render (app) + Neon (Postgres and object storage) + cron-job.org (scheduler), al
 
 ## Tech
 
-Java 21, Spring Boot 3, PostgreSQL on Neon, Neon Object Storage (via the AWS S3 SDK), plain HTML/CSS/JS front end, JUnit tests (`./mvnw test` runs on an in-memory database, no setup needed).
+Java 21, Spring Boot 3, Python (pandas, scikit-learn, LightGBM) for the ML model, PostgreSQL on Neon, Neon Object Storage (via the AWS S3 SDK), plain HTML/CSS/JS front end, JUnit tests (`./mvnw test` runs on an in-memory database, no setup needed).
 
 ## Roadmap
 
+- Use the ML model's predictions for transfer advice once it has beaten the formula over several gameweeks
+
 - Mini-league rival comparison
-- Python ML model to replace the formula-based projections

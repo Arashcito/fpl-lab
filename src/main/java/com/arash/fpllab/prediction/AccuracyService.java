@@ -11,6 +11,8 @@ import com.arash.fpllab.repository.PlayerRepository;
 import com.arash.fpllab.repository.PredictionSnapshotRepository;
 import com.arash.fpllab.storage.ArchiveService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.arash.fpllab.entity.PredictionSnapshotEntity.MODEL_FPL_LAB;
+import static com.arash.fpllab.entity.PredictionSnapshotEntity.MODEL_FPL_LAB_ML;
 import static com.arash.fpllab.entity.PredictionSnapshotEntity.MODEL_FPL_OFFICIAL;
 
 /**
@@ -50,11 +53,12 @@ public class AccuracyService {
     private final ArchiveService archiveService;
     private final ObjectMapper objectMapper;
     private final BulkWriter bulkWriter;
+    private final JdbcTemplate jdbc;
 
     public AccuracyService(PredictionService predictionService, PredictionSnapshotRepository snapshotRepository,
                            GameweekRepository gameweekRepository, PlayerRepository playerRepository,
                            PlayerGameweekRepository playerGameweekRepository, ArchiveService archiveService,
-                           ObjectMapper objectMapper, BulkWriter bulkWriter) {
+                           ObjectMapper objectMapper, BulkWriter bulkWriter, JdbcTemplate jdbc) {
         this.predictionService = predictionService;
         this.snapshotRepository = snapshotRepository;
         this.gameweekRepository = gameweekRepository;
@@ -63,6 +67,7 @@ public class AccuracyService {
         this.archiveService = archiveService;
         this.objectMapper = objectMapper;
         this.bulkWriter = bulkWriter;
+        this.jdbc = jdbc;
     }
 
     // ---- 1. saving predictions ----
@@ -96,19 +101,37 @@ public class AccuracyService {
                         p.getFplExpectedPoints(), now));
             }
         }
+        Map<Integer, Double> ml = mlPredictions(gw.getId());
+        ml.forEach((playerId, points) ->
+                rows.add(new PredictionSnapshotEntity(MODEL_FPL_LAB_ML, gw.getId(), playerId, points, now)));
         bulkWriter.upsertSnapshots(rows);
         logger.info("Saved {} predictions for GW{}", rows.size(), gw.getId());
-        archivePredictions(gw.getId(), now, projections);
+        archivePredictions(gw.getId(), now, projections, ml);
         return rows.size();
+    }
+
+    /**
+     * Latest machine-learning predictions for a gameweek, written by the Python job (ml/fpl_ml/predict.py)
+     * into the ml_predictions table. Empty when that job hasn't run yet (the table may not exist).
+     */
+    Map<Integer, Double> mlPredictions(int event) {
+        Map<Integer, Double> result = new HashMap<>();
+        try {
+            jdbc.query("SELECT player_id, predicted_points FROM ml_predictions WHERE event = ? AND model = ?",
+                    rs -> { result.put(rs.getInt(1), rs.getDouble(2)); }, event, MODEL_FPL_LAB_ML);
+        } catch (DataAccessException e) {
+            logger.debug("No ML predictions available yet: {}", e.getMessage());
+        }
+        return result;
     }
 
     /** One JSON file per gameweek in object storage; overwritten until the deadline, then final. */
     public record ArchivedPlayer(int id, String name, String team, String position, double price,
-                                 double fplLab, Double fplOfficial) {}
+                                 double fplLab, Double fplLabMl, Double fplOfficial) {}
 
     public record ArchivedPredictions(int event, Instant savedAt, List<String> models, List<ArchivedPlayer> players) {}
 
-    private void archivePredictions(int event, Instant savedAt, Projection.Set projections) {
+    private void archivePredictions(int event, Instant savedAt, Projection.Set projections, Map<Integer, Double> ml) {
         if (!archiveService.isEnabled()) {
             return;
         }
@@ -117,9 +140,11 @@ public class AccuracyService {
             List<ArchivedPlayer> list = projections.players().values().stream()
                     .sorted(Comparator.comparingDouble((Projection.Player p) -> p.pointsIn(0)).reversed())
                     .map(p -> new ArchivedPlayer(p.id(), p.name(), p.team(), p.position(), p.price(),
-                            p.pointsIn(0), players.containsKey(p.id()) ? players.get(p.id()).getFplExpectedPoints() : null))
+                            p.pointsIn(0), ml.get(p.id()),
+                            players.containsKey(p.id()) ? players.get(p.id()).getFplExpectedPoints() : null))
                     .toList();
-            var archive = new ArchivedPredictions(event, savedAt, List.of(MODEL_FPL_LAB, MODEL_FPL_OFFICIAL), list);
+            var archive = new ArchivedPredictions(event, savedAt,
+                    List.of(MODEL_FPL_LAB, MODEL_FPL_LAB_ML, MODEL_FPL_OFFICIAL), list);
             archiveService.putJson(ArchiveService.predictionsKey(event), objectMapper.writeValueAsString(archive));
         } catch (Exception e) {
             logger.warn("Could not archive GW{} predictions to object storage", event, e);
@@ -148,16 +173,22 @@ public class AccuracyService {
                         double rankCorrelation, double topPicksAverage,
                         Integer captainId, String captainName, double captainPredicted, double captainActual) {}
 
-    public record GameweekSummary(int event, String status, Instant savedAt, Score fplLab, Score fplOfficial,
-                                  Integer bestPlayerId, String bestPlayerName, int bestPlayerPoints) {}
+    /** fplLab = the formula, fplLabMl = the machine-learning model, fplOfficial = FPL's own estimate. */
+    public record GameweekSummary(int event, String status, Instant savedAt, Score fplLab, Score fplLabMl,
+                                  Score fplOfficial, Integer bestPlayerId, String bestPlayerName, int bestPlayerPoints) {}
 
+    /**
+     * Averages over finished gameweeks. The ML model joined later than the other two, so its
+     * averages cover its own gameweeks (mlGameweeksScored). "Wins" = lowest average error that gameweek.
+     */
     public record Overall(int gameweeksScored, Double fplLabError, Double fplOfficialError,
-                          Double fplLabTopPicks, Double fplOfficialTopPicks, int fplLabWins, int fplOfficialWins) {}
+                          Double fplLabTopPicks, Double fplOfficialTopPicks, int fplLabWins, int fplOfficialWins,
+                          int mlGameweeksScored, Double fplLabMlError, Double fplLabMlTopPicks, int fplLabMlWins) {}
 
     public record Report(Overall overall, List<GameweekSummary> gameweeks) {}
 
     public record PlayerRow(int playerId, String name, String team, String position,
-                            Double fplLab, Double fplOfficial, Integer actual, Integer minutes) {}
+                            Double fplLab, Double fplLabMl, Double fplOfficial, Integer actual, Integer minutes) {}
 
     public record GameweekDetail(GameweekSummary summary, List<PlayerRow> topPredicted,
                                  List<PlayerRow> overPredicted, List<PlayerRow> underPredicted) {}
@@ -188,6 +219,7 @@ public class AccuracyService {
 
         Map<Integer, Double> lab = predictions(snapshots, MODEL_FPL_LAB);
         Map<Integer, Double> official = predictions(snapshots, MODEL_FPL_OFFICIAL);
+        Map<Integer, Double> ml = predictions(snapshots, MODEL_FPL_LAB_ML);
         Map<Integer, PlayerGameweekEntity> actual = actuals(event);
 
         List<PlayerRow> rows = new ArrayList<>();
@@ -195,7 +227,8 @@ public class AccuracyService {
             PlayerEntity p = players.get(e.getKey());
             PlayerGameweekEntity a = actual.get(e.getKey());
             rows.add(new PlayerRow(e.getKey(), p == null ? "?" : p.getWebName(), teamShort(p), position(p),
-                    round(e.getValue()), official.containsKey(e.getKey()) ? round(official.get(e.getKey())) : null,
+                    round(e.getValue()), ml.containsKey(e.getKey()) ? round(ml.get(e.getKey())) : null,
+                    official.containsKey(e.getKey()) ? round(official.get(e.getKey())) : null,
                     a == null ? null : a.getTotalPoints(), a == null ? null : a.getMinutes()));
         }
         List<PlayerRow> top = rows.stream()
@@ -217,15 +250,16 @@ public class AccuracyService {
         Instant savedAt = snapshots.stream().map(PredictionSnapshotEntity::getSavedAt)
                 .max(Comparator.naturalOrder()).orElse(null);
         if (status.equals("upcoming")) {
-            return new GameweekSummary(event, status, savedAt, null, null, null, null, 0);
+            return new GameweekSummary(event, status, savedAt, null, null, null, null, null, 0);
         }
         Map<Integer, PlayerGameweekEntity> actual = actuals(event);
         Score lab = score(MODEL_FPL_LAB, predictions(snapshots, MODEL_FPL_LAB), actual, players);
         Score official = score(MODEL_FPL_OFFICIAL, predictions(snapshots, MODEL_FPL_OFFICIAL), actual, players);
+        Score ml = score(MODEL_FPL_LAB_ML, predictions(snapshots, MODEL_FPL_LAB_ML), actual, players);
 
         PlayerGameweekEntity best = actual.values().stream()
                 .max(Comparator.comparingInt(PlayerGameweekEntity::getTotalPoints)).orElse(null);
-        return new GameweekSummary(event, status, savedAt, lab, official,
+        return new GameweekSummary(event, status, savedAt, lab, ml, official,
                 best == null ? null : best.getPlayerId(),
                 best == null ? null : name(players.get(best.getPlayerId())),
                 best == null ? 0 : best.getTotalPoints());
@@ -256,8 +290,8 @@ public class AccuracyService {
     }
 
     static Overall overall(List<GameweekSummary> summaries) {
-        int n = 0, labWins = 0, officialWins = 0;
-        double labError = 0, officialError = 0, labTop = 0, officialTop = 0;
+        int n = 0, labWins = 0, officialWins = 0, mlN = 0, mlWins = 0;
+        double labError = 0, officialError = 0, labTop = 0, officialTop = 0, mlError = 0, mlTop = 0;
         for (GameweekSummary s : summaries) {
             if (!"finished".equals(s.status()) || s.fplLab() == null || s.fplOfficial() == null) {
                 continue;
@@ -267,14 +301,30 @@ public class AccuracyService {
             officialError += s.fplOfficial().meanAbsoluteError();
             labTop += s.fplLab().topPicksAverage();
             officialTop += s.fplOfficial().topPicksAverage();
-            if (s.fplLab().meanAbsoluteError() < s.fplOfficial().meanAbsoluteError()) labWins++;
-            else if (s.fplOfficial().meanAbsoluteError() < s.fplLab().meanAbsoluteError()) officialWins++;
+            if (s.fplLabMl() != null) {
+                mlN++;
+                mlError += s.fplLabMl().meanAbsoluteError();
+                mlTop += s.fplLabMl().topPicksAverage();
+            }
+            // the gameweek's winner: lowest average error among the models scored (a tie wins nothing)
+            List<Score> scored = new ArrayList<>(List.of(s.fplLab(), s.fplOfficial()));
+            if (s.fplLabMl() != null) scored.add(s.fplLabMl());
+            scored.sort(Comparator.comparingDouble(Score::meanAbsoluteError));
+            if (scored.get(0).meanAbsoluteError() < scored.get(1).meanAbsoluteError()) {
+                switch (scored.get(0).model()) {
+                    case MODEL_FPL_LAB -> labWins++;
+                    case MODEL_FPL_OFFICIAL -> officialWins++;
+                    case MODEL_FPL_LAB_ML -> mlWins++;
+                    default -> { }
+                }
+            }
         }
         if (n == 0) {
-            return new Overall(0, null, null, null, null, 0, 0);
+            return new Overall(0, null, null, null, null, 0, 0, 0, null, null, 0);
         }
         return new Overall(n, round(labError / n), round(officialError / n), round(labTop / n),
-                round(officialTop / n), labWins, officialWins);
+                round(officialTop / n), labWins, officialWins,
+                mlN, mlN == 0 ? null : round(mlError / mlN), mlN == 0 ? null : round(mlTop / mlN), mlWins);
     }
 
     // ---- metrics (pure functions) ----

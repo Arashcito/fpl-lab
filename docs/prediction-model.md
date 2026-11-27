@@ -206,4 +206,4 @@ Note: predictions are only saved while the app is running before a deadline, so 
 - Players who change clubs mid-season are rated with their current team's history.
 - Suspensions are assumed to last the whole planning window.
 
-The planned Python model can replace sections 2–5 while the optimiser (sections 6–7) stays the same: it only needs xPts per player per gameweek.
+A machine-learning model now runs alongside this formula (see [ml/README.md](../ml/README.md)). Its predictions are saved before each deadline as a third model on the Accuracy page. If it proves better over several gameweeks, it can replace sections 2–5 while the optimiser (sections 6–7) stays the same: it only needs xPts per player per gameweek.
