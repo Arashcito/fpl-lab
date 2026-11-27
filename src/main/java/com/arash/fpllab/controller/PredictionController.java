@@ -28,7 +28,7 @@ public class PredictionController {
                                                @RequestParam(required = false) String position,
                                                @RequestParam(required = false) Double maxPrice,
                                                @RequestParam(defaultValue = "50") int limit) {
-        return predictionService.top(horizon, position, maxPrice, limit);
+        return PredictionService.top(predictionService.project(horizon), position, maxPrice, limit);
     }
 
     // Transfer and captain advice for one FPL team (the number in your FPL "Points" page URL).

@@ -10,7 +10,7 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("bootstrap", "fixtures", "liveStandings", "projections", "accuracyReport", "accuracyDetail");
+        return new ConcurrentMapCacheManager("bootstrap", "fixtures", "liveStandings", "projections", "accuracyReport", "accuracyDetail", "myTeam");
     }
 }
 

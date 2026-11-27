@@ -121,6 +121,7 @@ public class SyncService {
             snapshotPredictions();
             evict("accuracyReport");
             evict("accuracyDetail");
+            evict("myTeam");
             warmCaches();
             lastSync = Instant.now();
             SyncResult result = new SyncResult(teams, players, fixtures, gameweeksSynced,

@@ -168,8 +168,12 @@ public class PredictionService {
     }
 
     /** Projections sorted by total expected points, optionally for one position. */
-    public List<Projection.Player> top(int horizon, String position, Double maxPrice, int limit) {
-        var set = project(horizon);
+    /**
+     * Best players of an already computed projection set. Static on purpose: callers pass in
+     * project(horizon) obtained through the Spring bean, so the cached result is used. (Calling
+     * project() from inside this class would skip the cache and recompute every player.)
+     */
+    public static List<Projection.Player> top(Projection.Set set, String position, Double maxPrice, int limit) {
         return set.players().values().stream()
                 .filter(p -> position == null || position.isBlank() || p.position().equalsIgnoreCase(position))
                 .filter(p -> maxPrice == null || p.price() <= maxPrice + 1e-9)

@@ -2,6 +2,7 @@ package com.arash.fpllab.prediction;
 
 import com.arash.fpllab.client.FplClient;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -57,6 +58,8 @@ public class MyTeamService {
 
     // ---- main entry point ----
 
+    // kept for 5 minutes (CacheScheduler) and cleared by every sync, so repeat visits are instant
+    @Cacheable(value = "myTeam", key = "#entryId + '-' + #horizon + '-' + #freeTransfersOverride")
     public Response analyse(int entryId, int horizon, Integer freeTransfersOverride) {
         Projection.Set projections = predictionService.project(horizon);
         if (projections.events().isEmpty()) {
@@ -69,6 +72,11 @@ public class MyTeamService {
         CompletableFuture<JsonNode> entryCall = async(() -> fetch(() -> fplClient.getEntry(entryId), "FPL team " + entryId + " not found"));
         CompletableFuture<JsonNode> transfersCall = async(() -> fetch(() -> fplClient.getEntryTransfers(entryId), "Could not load this team's transfers"));
         CompletableFuture<JsonNode> historyCall = async(() -> fetch(() -> fplClient.getEntryHistory(entryId), "Could not load this team's history"));
+        // picks need the team's current gameweek; start with the game's current gameweek (almost always the same)
+        int likelyEvent = currentGameweek();
+        CompletableFuture<JsonNode> likelyPicksCall = likelyEvent > 0
+                ? async(() -> fetch(() -> fplClient.getEntryPicks(entryId, likelyEvent), "Could not load this team's picks"))
+                : null;
         JsonNode entry = await(entryCall);
         if (entry.path("current_event").isNull() || entry.path("current_event").isMissingNode()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This team has not played a gameweek yet.");
@@ -76,7 +84,9 @@ public class MyTeamService {
         int currentEvent = entry.get("current_event").asInt();
         int startedEvent = entry.path("started_event").asInt(1);
 
-        JsonNode picks = fetch(() -> fplClient.getEntryPicks(entryId, currentEvent), "Could not load this team's picks");
+        JsonNode picks = likelyPicksCall != null && likelyEvent == currentEvent
+                ? await(likelyPicksCall)
+                : fetch(() -> fplClient.getEntryPicks(entryId, currentEvent), "Could not load this team's picks");
         JsonNode transfers = await(transfersCall);
         JsonNode history = await(historyCall);
 
@@ -263,6 +273,14 @@ public class MyTeamService {
                 .toList();
         return new PlanView(transfers, PredictionService.round2(plan.gain()), plan.hits(),
                 PredictionService.round2(plan.netGain()));
+    }
+
+    /** The game's current gameweek from the cached bootstrap data, or 0 if unknown. */
+    private int currentGameweek() {
+        for (JsonNode e : fplClient.getBootstrapStatic().path("events")) {
+            if (e.path("is_current").asBoolean()) return e.path("id").asInt();
+        }
+        return 0;
     }
 
     private static final ExecutorService FPL_CALLS = Executors.newVirtualThreadPerTaskExecutor();

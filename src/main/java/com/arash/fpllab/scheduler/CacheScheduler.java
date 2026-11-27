@@ -21,6 +21,15 @@ public class CacheScheduler {
      * Clears the league table caches every 2 minutes so the table
      * picks up new results on matchdays.
      */
+    /** Team analyses are kept for 5 minutes, then recalculated with fresh FPL data. */
+    @Scheduled(fixedRate = 5 * 60 * 1000)
+    public void clearTeamAnalyses() {
+        var cache = cacheManager.getCache("myTeam");
+        if (cache != null) {
+            cache.clear();
+        }
+    }
+
     @Scheduled(fixedRate = 2 * 60 * 1000)
     public void clearStandingsCaches() {
         for (String name : new String[]{"fixtures", "liveStandings"}) {
