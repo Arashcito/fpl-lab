@@ -5,9 +5,8 @@ async function loadPicks() {
     picksContainer.innerHTML = loadingState("Ranking the player pool");
     try {
         const [position, horizon, maxPrice] = pickFilters.map(element => element.value);
-        let players = await fetchProjections(horizon, position, 400);
-        if (maxPrice) players = players.filter(player => player.price <= Number(maxPrice));
-        players = players.slice(0, 40);
+        // the server filters by price and returns only the 40 rows shown (keeps the download small)
+        const players = await fetchProjections(horizon, position, 40, maxPrice);
         if (!players.length) {
             picksContainer.innerHTML = emptyState("No matching players", "Try another position or raise the maximum price.");
             return;

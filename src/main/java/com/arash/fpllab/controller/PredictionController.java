@@ -22,12 +22,13 @@ public class PredictionController {
     }
 
     // Expected points for the next few gameweeks, best first.
-    // example: http://localhost:8080/api/projections?horizon=3&position=MID&limit=20
+    // example: http://localhost:8080/api/projections?horizon=3&position=MID&maxPrice=7.5&limit=20
     @GetMapping("/api/projections")
     public List<Projection.Player> projections(@RequestParam(defaultValue = "3") int horizon,
                                                @RequestParam(required = false) String position,
+                                               @RequestParam(required = false) Double maxPrice,
                                                @RequestParam(defaultValue = "50") int limit) {
-        return predictionService.top(horizon, position, limit);
+        return predictionService.top(horizon, position, maxPrice, limit);
     }
 
     // Transfer and captain advice for one FPL team (the number in your FPL "Points" page URL).

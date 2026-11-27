@@ -1,0 +1,21 @@
+# Keeps the free Render server awake so visitors don't wait 30-60 seconds for it to start.
+# Render's free plan sleeps after 15 minutes without requests; a light ping every 10 minutes
+# prevents that. It calls /api/health, which doesn't touch the database (so Neon can still
+# scale to zero). Free for public repositories; Render's 750 free hours/month cover 24/7.
+name: Keep app awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping the app
+        run: |
+          # a sleeping server can take a minute or two to answer the first request
+          curl -s -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" --max-time 180 --retry 2 \
+            https://fpl-lab-atan.onrender.com/api/health

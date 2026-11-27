@@ -168,10 +168,11 @@ public class PredictionService {
     }
 
     /** Projections sorted by total expected points, optionally for one position. */
-    public List<Projection.Player> top(int horizon, String position, int limit) {
+    public List<Projection.Player> top(int horizon, String position, Double maxPrice, int limit) {
         var set = project(horizon);
         return set.players().values().stream()
                 .filter(p -> position == null || position.isBlank() || p.position().equalsIgnoreCase(position))
+                .filter(p -> maxPrice == null || p.price() <= maxPrice + 1e-9)
                 .sorted(Comparator.comparingDouble(Projection.Player::total).reversed())
                 .limit(Math.max(1, Math.min(limit, 700)))
                 .toList();

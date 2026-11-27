@@ -15,6 +15,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -193,6 +194,8 @@ public class AccuracyService {
     public record GameweekDetail(GameweekSummary summary, List<PlayerRow> topPredicted,
                                  List<PlayerRow> overPredicted, List<PlayerRow> underPredicted) {}
 
+    // results only change when a sync saves predictions or results, and the sync clears this cache
+    @Cacheable("accuracyReport")
     public Report report() {
         Map<Integer, List<PredictionSnapshotEntity>> byEvent = snapshotRepository.findAll().stream()
                 .collect(Collectors.groupingBy(PredictionSnapshotEntity::getEvent, TreeMap::new, Collectors.toList()));
@@ -208,6 +211,7 @@ public class AccuracyService {
         return new Report(overall(summaries), summaries);
     }
 
+    @Cacheable(value = "accuracyDetail", key = "#event")
     public GameweekDetail detail(int event) {
         List<PredictionSnapshotEntity> snapshots = snapshotRepository.findByEvent(event);
         if (snapshots.isEmpty()) {

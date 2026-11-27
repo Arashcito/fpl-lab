@@ -17,9 +17,10 @@ async function fetchStandings() {
     return fetchJson("/api/standings");
 }
 
-async function fetchProjections(horizon = 3, position = "", limit = 50) {
+async function fetchProjections(horizon = 3, position = "", limit = 50, maxPrice = "") {
     const params = new URLSearchParams({ horizon, limit });
     if (position) params.set("position", position);
+    if (maxPrice) params.set("maxPrice", maxPrice);
     return fetchJson(`/api/projections?${params}`);
 }
 

@@ -15,6 +15,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 /**
  * Loads a manager's FPL team by ID and advises transfers and captaincy.
@@ -60,7 +65,11 @@ public class MyTeamService {
         }
         int h = projections.events().size();
 
-        JsonNode entry = fetch(() -> fplClient.getEntry(entryId), "FPL team " + entryId + " not found");
+        // the three requests don't depend on each other, so send them at the same time
+        CompletableFuture<JsonNode> entryCall = async(() -> fetch(() -> fplClient.getEntry(entryId), "FPL team " + entryId + " not found"));
+        CompletableFuture<JsonNode> transfersCall = async(() -> fetch(() -> fplClient.getEntryTransfers(entryId), "Could not load this team's transfers"));
+        CompletableFuture<JsonNode> historyCall = async(() -> fetch(() -> fplClient.getEntryHistory(entryId), "Could not load this team's history"));
+        JsonNode entry = await(entryCall);
         if (entry.path("current_event").isNull() || entry.path("current_event").isMissingNode()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This team has not played a gameweek yet.");
         }
@@ -68,8 +77,8 @@ public class MyTeamService {
         int startedEvent = entry.path("started_event").asInt(1);
 
         JsonNode picks = fetch(() -> fplClient.getEntryPicks(entryId, currentEvent), "Could not load this team's picks");
-        JsonNode transfers = fetch(() -> fplClient.getEntryTransfers(entryId), "Could not load this team's transfers");
-        JsonNode history = fetch(() -> fplClient.getEntryHistory(entryId), "Could not load this team's history");
+        JsonNode transfers = await(transfersCall);
+        JsonNode history = await(historyCall);
 
         // squad after any transfers already made for the next deadline
         Set<Integer> squadIds = new LinkedHashSet<>();
@@ -254,6 +263,22 @@ public class MyTeamService {
                 .toList();
         return new PlanView(transfers, PredictionService.round2(plan.gain()), plan.hits(),
                 PredictionService.round2(plan.netGain()));
+    }
+
+    private static final ExecutorService FPL_CALLS = Executors.newVirtualThreadPerTaskExecutor();
+
+    private static CompletableFuture<JsonNode> async(Supplier<JsonNode> call) {
+        return CompletableFuture.supplyAsync(call, FPL_CALLS);
+    }
+
+    /** Waits for a parallel call; errors (e.g. "team not found") come out exactly as if called directly. */
+    private static JsonNode await(CompletableFuture<JsonNode> call) {
+        try {
+            return call.join();
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof RuntimeException r) throw r;
+            throw e;
+        }
     }
 
     private interface Call {

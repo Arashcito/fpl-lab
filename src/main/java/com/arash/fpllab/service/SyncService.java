@@ -7,6 +7,7 @@ import com.arash.fpllab.entity.PlayerEntity;
 import com.arash.fpllab.entity.PlayerGameweekEntity;
 import com.arash.fpllab.entity.TeamEntity;
 import com.arash.fpllab.prediction.AccuracyService;
+import com.arash.fpllab.prediction.PredictionService;
 import com.arash.fpllab.repository.BulkWriter;
 import com.arash.fpllab.repository.FixtureRepository;
 import com.arash.fpllab.repository.GameweekRepository;
@@ -46,6 +47,7 @@ public class SyncService {
     private final PlayerGameweekRepository playerGameweekRepository;
     private final CacheManager cacheManager;
     private final AccuracyService accuracyService;
+    private final PredictionService predictionService;
     private final BulkWriter bulkWriter;
     private final boolean syncOnStartup;
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -59,6 +61,7 @@ public class SyncService {
                        PlayerGameweekRepository playerGameweekRepository,
                        CacheManager cacheManager,
                        AccuracyService accuracyService,
+                       PredictionService predictionService,
                        BulkWriter bulkWriter,
                        @Value("${fpl.sync.on-startup:true}") boolean syncOnStartup) {
         this.fplClient = fplClient;
@@ -69,6 +72,7 @@ public class SyncService {
         this.playerGameweekRepository = playerGameweekRepository;
         this.cacheManager = cacheManager;
         this.accuracyService = accuracyService;
+        this.predictionService = predictionService;
         this.bulkWriter = bulkWriter;
         this.syncOnStartup = syncOnStartup;
     }
@@ -115,6 +119,9 @@ public class SyncService {
 
             evict("projections");
             snapshotPredictions();
+            evict("accuracyReport");
+            evict("accuracyDetail");
+            warmCaches();
             lastSync = Instant.now();
             SyncResult result = new SyncResult(teams, players, fixtures, gameweeksSynced,
                     System.currentTimeMillis() - start, lastSync);
@@ -131,6 +138,19 @@ public class SyncService {
             accuracyService.snapshotNextGameweek();
         } catch (Exception e) {
             logger.warn("Could not save predictions for the accuracy page", e);
+        }
+    }
+
+    /**
+     * Pre-computes the most requested results right after a sync, so the first visitor doesn't
+     * wait for them on the small free server: Top Picks / My Team (3 gameweeks) and the Accuracy page.
+     */
+    private void warmCaches() {
+        try {
+            predictionService.project(3);
+            accuracyService.report();
+        } catch (Exception e) {
+            logger.warn("Could not pre-compute caches", e);
         }
     }
 
