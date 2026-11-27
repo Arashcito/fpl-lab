@@ -1,0 +1,113 @@
+{
+  "version": "lgbm-20261127",
+  "params": {
+    "n_estimators": 150,
+    "num_leaves": 31,
+    "min_child_samples": 200,
+    "learning_rate": 0.03
+  },
+  "rows": 119822,
+  "validation": {
+    "train": [
+      "2022-23",
+      "2023-24",
+      "2024-25"
+    ],
+    "test": "2025-26",
+    "results": {
+      "last5": {
+        "gameweeks": 38,
+        "mae": 2.237,
+        "bias": -0.481,
+        "rank_corr": 0.271,
+        "top10_points": 4.121,
+        "captain_points": 4.711
+      },
+      "fpl_xp": {
+        "gameweeks": 38,
+        "mae": 2.671,
+        "bias": -2.26,
+        "rank_corr": 0.582,
+        "top10_points": 3.689,
+        "captain_points": 5.816
+      },
+      "ridge": {
+        "gameweeks": 38,
+        "mae": 1.99,
+        "bias": -0.737,
+        "rank_corr": 0.341,
+        "top10_points": 4.724,
+        "captain_points": 7.289
+      },
+      "lgbm": {
+        "gameweeks": 38,
+        "mae": 1.994,
+        "bias": -0.713,
+        "rank_corr": 0.339,
+        "top10_points": 4.871,
+        "captain_points": 7.132
+      }
+    }
+  },
+  "test": {
+    "train": [
+      "2022-23",
+      "2023-24",
+      "2024-25",
+      "2025-26"
+    ],
+    "test": "2026-27",
+    "gameweeks": 10,
+    "results": {
+      "last5": {
+        "gameweeks": 10,
+        "mae": 2.23,
+        "bias": -0.507,
+        "rank_corr": 0.283,
+        "top10_points": 4.02,
+        "captain_points": 3.3
+      },
+      "fpl_xp": {
+        "gameweeks": 10,
+        "mae": 2.349,
+        "bias": -1.669,
+        "rank_corr": 0.537,
+        "top10_points": 5.53,
+        "captain_points": 8.4
+      },
+      "ridge": {
+        "gameweeks": 10,
+        "mae": 1.976,
+        "bias": -0.751,
+        "rank_corr": 0.367,
+        "top10_points": 4.19,
+        "captain_points": 4.3
+      },
+      "lgbm": {
+        "gameweeks": 10,
+        "mae": 1.966,
+        "bias": -0.75,
+        "rank_corr": 0.355,
+        "top10_points": 4.94,
+        "captain_points": 4.8
+      }
+    }
+  },
+  "feature_importance": {
+    "minutes_last3": 1741729.5,
+    "total_points_last3": 493770.9,
+    "season_points_per_match": 204015.0,
+    "value": 159689.1,
+    "minutes_last5": 53026.8,
+    "opp_xg_against": 44814.8,
+    "opp_xg_for": 40188.7,
+    "bps_last3": 36161.6,
+    "season_minutes_per_match": 33700.4,
+    "opp_goals_for": 32658.7,
+    "team_xg_for": 25469.5,
+    "total_points_last5": 24318.2,
+    "team_xg_against": 24252.4,
+    "was_home": 23625.5,
+    "season_xg_per90": 21686.0
+  }
+}
