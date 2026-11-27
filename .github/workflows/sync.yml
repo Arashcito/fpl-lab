@@ -15,15 +15,20 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check the secret is set
+        id: secret
         env:
           SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
           if [ -z "$SYNC_TOKEN" ]; then
-            echo "::error::Add the SYNC_TOKEN repository secret (Settings > Secrets and variables > Actions)."
-            exit 1
+            # skip (not fail) so a missing secret doesn't send a failure email every 30 minutes
+            echo "::warning::Skipped: add the SYNC_TOKEN repository secret (Settings > Secrets and variables > Actions)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Wake the app and sync
+        if: steps.secret.outputs.ready == 'true'
         env:
           SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
           APP_URL: https://fpl-lab-atan.onrender.com
