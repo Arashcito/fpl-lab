@@ -3,65 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPL Lab - My Team</title>
+    <meta name="description" content="Get data-backed FPL transfer advice, captain picks and expected points for your team.">
+    <meta name="theme-color" content="#101914">
+    <meta property="og:title" content="FPL Lab — Your team, your move">
+    <meta property="og:description" content="Transfer advice, captain picks and expected points for your FPL team.">
+    <meta property="og:image" content="https://fpl-lab-atan.onrender.com/social-card.svg">
+    <title>My Team · FPL Lab</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>FPL Lab</h1>
-            <p>Your team, your move</p>
-            <nav class="nav">
-                <a href="myteam.html" class="active">My Team</a>
-                <a href="picks.html">Top Picks</a>
-                <a href="accuracy.html">Accuracy</a>
-                <a href="teams.html">League Table</a>
-                <a href="players.html">Players</a>
-            </nav>
-        </div>
-
-        <div class="content">
-            <form id="team-form" class="team-form">
-                <label>
-                    FPL team ID
-                    <input id="entry-id" type="number" min="1" required placeholder="e.g. 1234567">
-                </label>
-                <label>
-                    Plan ahead
-                    <select id="horizon">
-                        <option value="1">1 gameweek</option>
-                        <option value="2">2 gameweeks</option>
-                        <option value="3" selected>3 gameweeks</option>
-                        <option value="4">4 gameweeks</option>
-                        <option value="5">5 gameweeks</option>
-                        <option value="6">6 gameweeks</option>
-                    </select>
-                </label>
-                <label>
-                    Free transfers
-                    <select id="free-transfers">
-                        <option value="">Auto</option>
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </label>
-                <button type="submit">Analyse</button>
-            </form>
-            <p class="hint">
-                Your team ID is the number in the address of your FPL "Points" page:
-                fantasy.premierleague.com/entry/<strong>1234567</strong>/event/10
-            </p>
-
-            <div id="result"></div>
-        </div>
+    <div class="app-shell">
+        <div data-site-header data-page="myteam"></div>
+        <main>
+            <section class="hero hero-team">
+                <div class="hero-copy">
+                    <span class="eyebrow">Fantasy decisions, explained</span>
+                    <h1>Make the move<br><span>before your rivals do.</span></h1>
+                    <p>See your strongest transfers, captain picks and fixture outlook—calculated for your actual FPL squad.</p>
+                </div>
+                <form id="team-form" class="team-form hero-form">
+                    <div class="form-heading">
+                        <span class="step-number">01</span>
+                        <div><strong>Analyse your squad</strong><span>Enter the ID from your FPL Points page.</span></div>
+                    </div>
+                    <label class="field-wide">
+                        <span>FPL team ID</span>
+                        <input id="entry-id" type="number" inputmode="numeric" min="1" required placeholder="e.g. 1234567" autocomplete="off">
+                    </label>
+                    <div class="form-row">
+                        <label><span>Plan ahead</span><select id="horizon"><option value="1">1 gameweek</option><option value="2">2 gameweeks</option><option value="3" selected>3 gameweeks</option><option value="4">4 gameweeks</option><option value="5">5 gameweeks</option><option value="6">6 gameweeks</option></select></label>
+                        <label><span>Free transfers</span><select id="free-transfers"><option value="">Auto-detect</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
+                    </div>
+                    <button class="button button-primary" type="submit"><span>Analyse my team</span><span aria-hidden="true">→</span></button>
+                    <p class="form-help">Find it in: <strong>fantasy.premierleague.com/entry/<mark>1234567</mark>/event/10</strong></p>
+                </form>
+            </section>
+            <section id="result" class="results" aria-live="polite"></section>
+            <section class="trust-strip" aria-label="How FPL Lab helps">
+                <div><span>01</span><strong>Your real squad</strong><p>Budget, selling prices and free transfers included.</p></div>
+                <div><span>02</span><strong>Fixture-aware</strong><p>Plan across the next one to six gameweeks.</p></div>
+                <div><span>03</span><strong>Fully transparent</strong><p>Open any player to see how the points were built.</p></div>
+            </section>
+        </main>
+        <div data-site-footer></div>
     </div>
-
-    <script src="js/api.js"></script>
-    <script src="js/projections.js"></script>
-    <script src="js/myteam.js"></script>
+    <script src="js/layout.js"></script><script src="js/ui.js"></script><script src="js/api.js"></script>
+    <script src="js/projections.js"></script><script src="js/myteam.js"></script>
 </body>
 </html>

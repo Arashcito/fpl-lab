@@ -1,51 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPL Lab - Players</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Search, filter and compare every Fantasy Premier League player.">
+    <meta name="theme-color" content="#101914"><title>Players · FPL Lab</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>FPL Lab</h1>
-            <p>Fantasy Premier League Players</p>
-            <nav class="nav">
-                <a href="myteam.html">My Team</a>
-                <a href="picks.html">Top Picks</a>
-                <a href="accuracy.html">Accuracy</a>
-                <a href="teams.html">League Table</a>
-                <a href="players.html" class="active">Players</a>
-            </nav>
-        </div>
-        
-        <div class="content">
-            <div class="stats" id="stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="total-players">-</div>
-                    <div class="stat-label">Total Players</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="avg-points">-</div>
-                    <div class="stat-label">Avg Points</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="avg-price">-</div>
-                    <div class="stat-label">Avg Price</div>
-                </div>
-            </div>
-            
-            <div class="players-section">
-                <h2 class="section-title">Players</h2>
-                <ul id="players">
-                    <li class="loading">Loading players...</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/api.js"></script>
-    <script src="js/players.js"></script>
-</body>
-</html>
+<body><div class="app-shell"><div data-site-header data-page="players"></div>
+    <main class="page-main">
+        <section class="page-intro"><div><span class="eyebrow">Full player database</span><h1>Know the whole player pool.</h1><p>Search every FPL player and sort the market by points, price or name.</p></div><div class="page-number" aria-hidden="true">05</div></section>
+        <section class="stats compact-stats" id="stats" aria-label="Player statistics">
+            <div class="stat-card"><span class="stat-kicker">Database</span><div class="stat-value" id="total-players">—</div><div class="stat-label">Total players</div></div>
+            <div class="stat-card"><span class="stat-kicker">Performance</span><div class="stat-value" id="avg-points">—</div><div class="stat-label">Average points</div></div>
+            <div class="stat-card"><span class="stat-kicker">Market</span><div class="stat-value" id="avg-price">—</div><div class="stat-label">Average price</div></div>
+        </section>
+        <section class="panel filter-panel">
+            <form id="players-filter" class="filter-form">
+                <label class="search-field"><span>Search player or club</span><input id="player-search" type="search" placeholder="Try Saka or Arsenal" autocomplete="off"></label>
+                <label><span>Position</span><select id="player-position"><option value="">All positions</option><option value="Goalkeeper">Goalkeepers</option><option value="Defender">Defenders</option><option value="Midfielder">Midfielders</option><option value="Forward">Forwards</option></select></label>
+                <label><span>Sort by</span><select id="player-sort"><option value="points-desc">Points: high to low</option><option value="price-desc">Price: high to low</option><option value="price-asc">Price: low to high</option><option value="name-asc">Name: A–Z</option></select></label>
+            </form>
+        </section>
+        <section class="data-section"><div class="section-heading"><div><span class="eyebrow">Market view</span><h2>Players <span id="player-count" class="count-badge"></span></h2></div></div><ul id="players" class="player-grid" aria-live="polite"></ul></section>
+    </main><div data-site-footer></div>
+</div>
+<script src="js/layout.js"></script><script src="js/ui.js"></script><script src="js/api.js"></script><script src="js/players.js"></script>
+</body></html>

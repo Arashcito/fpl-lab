@@ -1,52 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPL Lab - Accuracy</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="See how FPL Lab's formula and machine-learning predictions perform against real FPL points.">
+    <meta name="theme-color" content="#101914"><title>Accuracy · FPL Lab</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>FPL Lab</h1>
-            <p>How good are the predictions?</p>
-            <nav class="nav">
-                <a href="myteam.html">My Team</a>
-                <a href="picks.html">Top Picks</a>
-                <a href="accuracy.html" class="active">Accuracy</a>
-                <a href="teams.html">League Table</a>
-                <a href="players.html">Players</a>
-            </nav>
-        </div>
-
-        <div class="content">
-            <p class="hint">
-                Before every deadline FPL Lab saves every player's predicted points from three models: the
-                <strong>formula</strong> (hand-written rules), the <strong>ML model</strong> (LightGBM trained on five
-                seasons of history) and <strong>FPL's own official estimate</strong>. After the gameweek all three are
-                compared with what really happened.
-            </p>
-            <div id="accuracy"><div class="loading">Loading...</div></div>
-
-            <details class="alternatives explain">
-                <summary>What do these numbers mean?</summary>
-                <ul class="reasons">
-                    <li><strong>Average error</strong>: how far off a prediction is, on average, for players who played.
-                        Lower is better. FPL points are very random, so even a good model is about 2 points off.</li>
-                    <li><strong>Ranking</strong>: does the model put players in the right order? 1.00 = perfect order,
-                        0 = random. This matters most for picking players.</li>
-                    <li><strong>Top 10 picks</strong>: average real points of the 10 players the model rated highest.
-                        Higher is better. This is what you would have got by trusting it.</li>
-                    <li><strong>Captain</strong>: the single highest-predicted player, and what he actually scored.</li>
-                    <li><strong>Bias</strong>: above 0 means the model was too optimistic, below 0 too pessimistic.</li>
-                </ul>
-            </details>
-        </div>
-    </div>
-
-    <script src="js/api.js"></script>
-    <script src="js/projections.js"></script>
-    <script src="js/accuracy.js"></script>
-</body>
-</html>
+<body><div class="app-shell"><div data-site-header data-page="accuracy"></div>
+    <main class="page-main">
+        <section class="page-intro"><div><span class="eyebrow">No cherry-picking</span><h1>Every prediction. Scored.</h1><p>Formula, machine-learning model and FPL official—frozen before the deadline and judged after the final whistle.</p></div><div class="page-number" aria-hidden="true">03</div></section>
+        <section class="method-strip"><div><span class="method-dot capture"></span><strong>Before deadline</strong><p>Predictions are saved.</p></div><span aria-hidden="true">→</span><div><span class="method-dot wait"></span><strong>After matches</strong><p>Real points arrive.</p></div><span aria-hidden="true">→</span><div><span class="method-dot score"></span><strong>Models scored</strong><p>Lower error wins.</p></div></section>
+        <div id="accuracy" aria-live="polite"></div>
+        <details class="panel explain"><summary>How to read the accuracy metrics <span aria-hidden="true">+</span></summary><div class="metric-definitions">
+            <div><strong>Average error</strong><p>Average distance between predicted and real points. Lower is better.</p></div><div><strong>Ranking</strong><p>How closely the predicted player order matched reality. Closer to 1 is better.</p></div><div><strong>Top 10 picks</strong><p>Real average points from each model’s ten highest-rated players.</p></div><div><strong>Bias</strong><p>Above zero means optimistic; below zero means pessimistic.</p></div>
+        </div></details>
+    </main><div data-site-footer></div>
+</div>
+<script src="js/layout.js"></script><script src="js/ui.js"></script><script src="js/api.js"></script><script src="js/projections.js"></script><script src="js/accuracy.js"></script>
+</body></html>

@@ -1,6 +1,7 @@
 const form = document.getElementById("team-form");
 const entryInput = document.getElementById("entry-id");
 const result = document.getElementById("result");
+const submitButton = form.querySelector("button[type='submit']");
 
 // remember the last team ID on this device
 try {
@@ -22,14 +23,21 @@ async function analyse() {
 
     const horizon = document.getElementById("horizon").value;
     const freeTransfers = document.getElementById("free-transfers").value;
-    result.innerHTML = '<div class="loading">Loading your team and running the numbers...</div>';
+    submitButton.disabled = true;
+    submitButton.firstElementChild.textContent = "Running the numbers…";
+    result.innerHTML = loadingState("Loading your squad and testing transfer plans");
     try {
         const data = await fetchMyTeam(entryId, horizon, freeTransfers);
         result.innerHTML = render(data);
         attachBreakdownToggles(result);
+        result.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
         console.error(err);
-        result.innerHTML = `<div class="error">${escapeHtml(err.message)}</div>`;
+        result.innerHTML = errorState("We couldn’t analyse that team", err.message, "team");
+        result.querySelector("[data-retry]")?.addEventListener("click", analyse);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.firstElementChild.textContent = "Analyse my team";
     }
 }
 
@@ -38,6 +46,7 @@ function render(d) {
     return `
         <div class="team-banner">
             <div>
+                <span class="eyebrow">Squad analysis</span>
                 <div class="team-title">${escapeHtml(d.teamName)}</div>
                 <div class="sub">${escapeHtml(d.managerName)}${d.overallRank ? ` · Rank ${d.overallRank.toLocaleString()}` : ""} · ${d.overallPoints} pts</div>
             </div>
@@ -45,14 +54,17 @@ function render(d) {
 
         <div class="stats">
             <div class="stat-card">
+                <span class="stat-kicker">Budget</span>
                 <div class="stat-value">£${fmt(d.bank)}m</div>
                 <div class="stat-label">In the bank</div>
             </div>
             <div class="stat-card">
+                <span class="stat-kicker">Planning</span>
                 <div class="stat-value">${d.freeTransfers}</div>
                 <div class="stat-label">Free transfers${d.freeTransfersEstimated ? " (estimated)" : ""}</div>
             </div>
             <div class="stat-card">
+                <span class="stat-kicker">Forecast</span>
                 <div class="stat-value">${fmt(d.squadValue)}</div>
                 <div class="stat-label">Projected pts ${gwRange} (best XI + captain)</div>
             </div>
@@ -61,8 +73,8 @@ function render(d) {
         ${renderAdvice(d)}
         ${renderCaptains(d)}
 
-        <h2 class="section-title">Your squad, ${gwRange}</h2>
-        <p class="hint">Expected points per gameweek (H = home, A = away). Click a player for the breakdown.</p>
+        <div class="section-heading"><div><span class="eyebrow">Fixture outlook</span><h2>Your squad, ${gwRange}</h2></div>
+        <p class="hint">Expected points per gameweek. Select a player for the breakdown.</p></div>
         ${projectionTable(d.squad.map(s => s.player), {
             extraColumns: [{
                 header: "Sell",
@@ -98,16 +110,16 @@ function renderAdvice(d) {
     const altRows = alternatives.map(p => {
         const t = p.transfers[0];
         return `<tr>
-            <td class="team-name">${escapeHtml(t.out.name)} → ${escapeHtml(t.in.name)}</td>
-            <td>${escapeHtml(t.in.team)} · ${t.in.position}</td>
-            <td>£${fmt(t.buyPrice)}</td>
-            <td class="${p.netGain >= 0 ? "positive" : "negative"}">${p.netGain >= 0 ? "+" : ""}${fmt(p.netGain)}</td>
+            <td class="team-name" data-label="Move">${escapeHtml(t.out.name)} → ${escapeHtml(t.in.name)}</td>
+            <td data-label="Player">${escapeHtml(t.in.team)} · ${t.in.position}</td>
+            <td data-label="Price">£${fmt(t.buyPrice)}</td>
+            <td data-label="Gain" class="${p.netGain >= 0 ? "positive" : "negative"}">${p.netGain >= 0 ? "+" : ""}${fmt(p.netGain)}</td>
         </tr>`;
     }).join("");
 
     return `
         <div class="advice ${a.rollTransfer ? "advice-roll" : ""}">
-            <h2 class="section-title">Transfer advice</h2>
+            <span class="eyebrow">Recommended move</span><h2 class="section-title">Transfer advice</h2>
             <p class="advice-summary">${escapeHtml(a.summary)}</p>
             ${body}
             ${altRows ? `
@@ -151,6 +163,6 @@ function renderCaptains(d) {
             <span class="why">${escapeHtml(c.player.reasons.slice(0, 2).join(" · "))}</span>
         </li>`).join("");
     return `
-        <h2 class="section-title">Captain picks for GW${d.nextEvent}</h2>
+        <span class="eyebrow">Armband shortlist</span><h2 class="section-title">Captain picks for GW${d.nextEvent}</h2>
         <ol class="captain-list">${items}</ol>`;
 }

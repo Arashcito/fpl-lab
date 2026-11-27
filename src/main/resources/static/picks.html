@@ -1,83 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPL Lab - Top Picks</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore the best FPL players by expected points, price and position.">
+    <meta name="theme-color" content="#101914"><title>Top Picks · FPL Lab</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>FPL Lab</h1>
-            <p>Best players by expected points</p>
-            <nav class="nav">
-                <a href="myteam.html">My Team</a>
-                <a href="picks.html" class="active">Top Picks</a>
-                <a href="accuracy.html">Accuracy</a>
-                <a href="teams.html">League Table</a>
-                <a href="players.html">Players</a>
-            </nav>
-        </div>
-
-        <div class="content">
-            <form id="picks-form" class="team-form">
-                <label>
-                    Position
-                    <select id="position">
-                        <option value="">All</option>
-                        <option value="GKP">Goalkeepers</option>
-                        <option value="DEF">Defenders</option>
-                        <option value="MID">Midfielders</option>
-                        <option value="FWD">Forwards</option>
-                    </select>
-                </label>
-                <label>
-                    Plan ahead
-                    <select id="horizon">
-                        <option value="1">1 gameweek</option>
-                        <option value="3" selected>3 gameweeks</option>
-                        <option value="5">5 gameweeks</option>
-                    </select>
-                </label>
-                <label>
-                    Max price (£m)
-                    <input id="max-price" type="number" step="0.1" min="3.5" placeholder="any">
-                </label>
+<body><div class="app-shell"><div data-site-header data-page="picks"></div>
+    <main class="page-main">
+        <section class="page-intro">
+            <div><span class="eyebrow">Player explorer</span><h1>Find your next difference-maker.</h1><p>Compare expected points across upcoming fixtures. Select a player to inspect the model.</p></div>
+            <div class="page-number" aria-hidden="true">02</div>
+        </section>
+        <section class="panel filter-panel">
+            <form id="picks-form" class="filter-form">
+                <label><span>Position</span><select id="position"><option value="">All positions</option><option value="GKP">Goalkeepers</option><option value="DEF">Defenders</option><option value="MID">Midfielders</option><option value="FWD">Forwards</option></select></label>
+                <label><span>Plan ahead</span><select id="horizon"><option value="1">1 gameweek</option><option value="3" selected>3 gameweeks</option><option value="5">5 gameweeks</option></select></label>
+                <label><span>Maximum price</span><div class="input-prefix"><span>£</span><input id="max-price" type="number" step="0.1" min="3.5" placeholder="Any"></div></label>
+                <button class="button button-secondary" type="submit">Update picks</button>
             </form>
-            <p class="hint">Click a player to see where the points come from.</p>
-            <div id="picks"></div>
-        </div>
-    </div>
-
-    <script src="js/api.js"></script>
-    <script src="js/projections.js"></script>
-    <script>
-        const els = ["position", "horizon", "max-price"].map(id => document.getElementById(id));
-
-        async function loadPicks() {
-            const container = document.getElementById("picks");
-            container.innerHTML = '<div class="loading">Loading projections...</div>';
-            try {
-                const [position, horizon, maxPrice] = els.map(e => e.value);
-                let players = await fetchProjections(horizon, position, 400);
-                if (maxPrice) players = players.filter(p => p.price <= parseFloat(maxPrice));
-                players = players.slice(0, 40);
-                if (players.length === 0) {
-                    container.innerHTML = '<div class="error">No players match. The data may still be syncing.</div>';
-                    return;
-                }
-                container.innerHTML = projectionTable(players, { showOwnership: true });
-                attachBreakdownToggles(container);
-            } catch (e) {
-                console.error(e);
-                container.innerHTML = '<div class="error">Could not load projections. Is the API running?</div>';
-            }
-        }
-
-        els.forEach(e => e.addEventListener("change", loadPicks));
-        document.getElementById("picks-form").addEventListener("submit", e => { e.preventDefault(); loadPicks(); });
-        loadPicks();
-    </script>
-</body>
-</html>
+        </section>
+        <section class="data-section"><div class="section-heading"><div><span class="eyebrow">Ranked by xPts</span><h2>Top players</h2></div><p class="hint">Select a row for the full breakdown.</p></div><div id="picks" aria-live="polite"></div></section>
+    </main><div data-site-footer></div>
+</div>
+<script src="js/layout.js"></script><script src="js/ui.js"></script><script src="js/api.js"></script><script src="js/projections.js"></script><script src="js/picks.js"></script>
+</body></html>

@@ -1,15 +1,5 @@
 // Shared rendering for projected points: fixture heatmap rows and point breakdowns.
 
-function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text == null ? "" : String(text);
-    return div.innerHTML;
-}
-
-function fmt(n, digits = 1) {
-    return Number(n).toFixed(digits);
-}
-
 // Cell colour by expected points: 0 -> red, ~3 -> neutral, 6+ -> dark green
 function heatClass(points) {
     if (points <= 0.05) return "heat-0";
@@ -28,7 +18,7 @@ function fixtureLabel(gw) {
 
 function gameweekCells(player) {
     return player.gameweeks.map(gw => `
-        <td class="heat ${heatClass(gw.points)}" title="GW${gw.event}">
+        <td class="heat ${heatClass(gw.points)}" data-label="GW${gw.event}" title="GW${gw.event}">
             <div class="fixture">${escapeHtml(fixtureLabel(gw))}</div>
             <div class="xpts">${fmt(gw.points)}</div>
         </td>`).join("");
@@ -90,13 +80,13 @@ function projectionTable(players, options = {}) {
     const events = players[0].gameweeks.map(g => g.event);
     const extra = options.extraColumns || [];
     const rows = players.map(p => `
-        <tr class="player-row ${options.rowClass ? options.rowClass(p) : ""}" data-id="${p.id}">
-            <td class="team-name">${escapeHtml(p.name)} ${options.nameBadge ? options.nameBadge(p) : ""}${statusBadge(p)}<div class="sub">${escapeHtml(p.team)} · ${p.position}</div></td>
-            ${extra.map(c => `<td>${c.cell(p)}</td>`).join("")}
-            <td>£${fmt(p.price)}</td>
-            ${options.showOwnership ? `<td>${fmt(p.selectedByPercent)}%</td>` : ""}
+        <tr class="player-row ${options.rowClass ? options.rowClass(p) : ""}" data-id="${p.id}" tabindex="0" role="button" aria-expanded="false" aria-label="Show ${escapeHtml(p.name)} projection details">
+            <td class="team-name" data-label="Player">${escapeHtml(p.name)} ${options.nameBadge ? options.nameBadge(p) : ""}${statusBadge(p)}<div class="sub">${escapeHtml(p.team)} · ${p.position}</div></td>
+            ${extra.map(c => `<td data-label="${escapeHtml(c.header)}">${c.cell(p)}</td>`).join("")}
+            <td data-label="Price">£${fmt(p.price)}</td>
+            ${options.showOwnership ? `<td data-label="Owned">${fmt(p.selectedByPercent)}%</td>` : ""}
             ${gameweekCells(p)}
-            <td class="points">${fmt(p.total)}</td>
+            <td class="points" data-label="Total">${fmt(p.total)}</td>
         </tr>
         <tr class="breakdown-row" data-for="${p.id}" hidden>
             <td colspan="${4 + extra.length + events.length + (options.showOwnership ? 1 : 0)}">${breakdownHtml(p)}</td>
@@ -121,9 +111,19 @@ function projectionTable(players, options = {}) {
 
 function attachBreakdownToggles(container) {
     container.querySelectorAll(".player-row").forEach(row => {
-        row.addEventListener("click", () => {
+        const toggle = () => {
             const detail = container.querySelector(`.breakdown-row[data-for="${row.dataset.id}"]`);
-            if (detail) detail.hidden = !detail.hidden;
+            if (detail) {
+                detail.hidden = !detail.hidden;
+                row.setAttribute("aria-expanded", String(!detail.hidden));
+            }
+        };
+        row.addEventListener("click", toggle);
+        row.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                toggle();
+            }
         });
     });
 }

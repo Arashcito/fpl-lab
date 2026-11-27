@@ -3,24 +3,30 @@ const container = document.getElementById("accuracy");
 loadAccuracy();
 
 async function loadAccuracy() {
+    container.innerHTML = loadingState("Loading prediction results");
     try {
         const report = await fetchJson("/api/accuracy");
         container.innerHTML = render(report);
-        container.querySelectorAll("tr[data-event]").forEach(row =>
-            row.addEventListener("click", () => toggleDetail(row)));
+        container.querySelectorAll("tr[data-event]").forEach(row => {
+            row.addEventListener("click", () => toggleDetail(row));
+            row.addEventListener("keydown", event => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    toggleDetail(row);
+                }
+            });
+        });
     } catch (e) {
         console.error(e);
-        container.innerHTML = '<div class="error">Could not load accuracy data. Is the API running?</div>';
+        container.innerHTML = errorState("Couldn’t load the accuracy report", "The server may still be waking up. Wait a moment and try again.", "accuracy");
+        container.querySelector("[data-retry]")?.addEventListener("click", loadAccuracy);
     }
 }
 
 function render(report) {
     const gws = report.gameweeks;
     if (!gws.length) {
-        return `<div class="advice advice-roll">
-            <p class="advice-summary">No predictions saved yet.</p>
-            <p>They are saved automatically before the next deadline while the app is running.</p>
-        </div>`;
+        return emptyState("No predictions saved yet", "Predictions are captured automatically before the next gameweek deadline.");
     }
     return overallCards(report.overall, gws) + gameweekTable(gws);
 }
@@ -69,19 +75,23 @@ function overallCards(o, gws) {
     return `
         <div class="stats stats-4">
             <div class="stat-card">
+                <span class="stat-kicker">Sample</span>
                 <div class="stat-value">${o.gameweeksScored}</div>
                 <div class="stat-label">Gameweeks scored${o.mlGameweeksScored && o.mlGameweeksScored < o.gameweeksScored
                     ? ` (ML model: ${o.mlGameweeksScored})` : ""}</div>
             </div>
             <div class="stat-card">
+                <span class="stat-kicker">Precision</span>
                 <div class="stat-models">${compare(errors, 2, true)}</div>
                 <div class="stat-label">Average error (lower is better)</div>
             </div>
             <div class="stat-card">
+                <span class="stat-kicker">Selection</span>
                 <div class="stat-models">${compare(top, 1, false)}</div>
                 <div class="stat-label">Points per top-10 pick</div>
             </div>
             <div class="stat-card">
+                <span class="stat-kicker">Scoreboard</span>
                 <div class="stat-models">${compare(wins, 0, false)}</div>
                 <div class="stat-label">Gameweeks with the lowest error</div>
             </div>
@@ -91,28 +101,28 @@ function overallCards(o, gws) {
 function gameweekTable(gws) {
     const rows = gws.map(g => {
         if (!g.fplLab) {
-            return `<tr><td class="position">GW${g.event}</td><td>${escapeHtml(g.status)}</td>
-                <td colspan="5" class="sub">Predictions saved, waiting for the matches ·
+            return `<tr><td class="position" data-label="Gameweek">GW${g.event}</td><td data-label="Status">${escapeHtml(g.status)}</td>
+                <td colspan="5" data-label="Update" class="sub">Predictions saved, waiting for the matches ·
                     <a href="/api/accuracy/${g.event}/download">download JSON</a></td></tr>`;
         }
         const metric = (field, digits, lower) =>
             compare(MODELS.map(m => ({ label: m.label, value: g[m.key] ? g[m.key][field] : null })), digits, lower);
         const lab = g.fplLab;
         return `
-            <tr data-event="${g.event}" class="player-row">
-                <td class="position">GW${g.event}</td>
-                <td>${escapeHtml(g.status)}</td>
-                <td>${metric("meanAbsoluteError", 2, true)}</td>
-                <td>${metric("rankCorrelation", 2, false)}</td>
-                <td>${metric("topPicksAverage", 1, false)}</td>
-                <td class="team-name">${escapeHtml(lab.captainName)} <span class="sub">${fmt(lab.captainPredicted)} → <strong>${lab.captainActual}</strong></span></td>
-                <td class="team-name">${escapeHtml(g.bestPlayerName || "–")} <span class="sub">${g.bestPlayerPoints} pts</span></td>
+            <tr data-event="${g.event}" class="player-row" tabindex="0" role="button" aria-expanded="false" aria-label="Show GW${g.event} accuracy details">
+                <td class="position" data-label="Gameweek">GW${g.event}</td>
+                <td data-label="Status">${escapeHtml(g.status)}</td>
+                <td data-label="Average error">${metric("meanAbsoluteError", 2, true)}</td>
+                <td data-label="Ranking">${metric("rankCorrelation", 2, false)}</td>
+                <td data-label="Top 10 picks">${metric("topPicksAverage", 1, false)}</td>
+                <td class="team-name" data-label="Formula captain">${escapeHtml(lab.captainName)} <span class="sub">${fmt(lab.captainPredicted)} → <strong>${lab.captainActual}</strong></span></td>
+                <td class="team-name" data-label="Best player">${escapeHtml(g.bestPlayerName || "–")} <span class="sub">${g.bestPlayerPoints} pts</span></td>
             </tr>
-            <tr class="breakdown-row" data-detail="${g.event}" hidden><td colspan="7"><div class="loading">Loading...</div></td></tr>`;
+            <tr class="breakdown-row" data-detail="${g.event}" hidden><td colspan="7">${loadingState("Loading gameweek details")}</td></tr>`;
     }).join("");
     return `
-        <h2 class="section-title">By gameweek</h2>
-        <p class="hint">✓ = best of the models that gameweek. Click a gameweek for details.</p>
+        <div class="section-heading"><div><span class="eyebrow">Gameweek archive</span><h2>By gameweek</h2></div>
+        <p class="hint">Green = best model. Select a gameweek for details.</p></div>
         <div class="table-scroll">
         <table class="standings-table">
             <thead><tr>
@@ -127,6 +137,7 @@ function gameweekTable(gws) {
 async function toggleDetail(row) {
     const detailRow = container.querySelector(`tr[data-detail="${row.dataset.event}"]`);
     detailRow.hidden = !detailRow.hidden;
+    row.setAttribute("aria-expanded", String(!detailRow.hidden));
     if (detailRow.hidden || detailRow.dataset.loaded) return;
     try {
         const d = await fetchJson(`/api/accuracy/${row.dataset.event}`);
@@ -139,7 +150,7 @@ async function toggleDetail(row) {
             <p class="hint"><a href="/api/accuracy/${row.dataset.event}/download">Download all GW${row.dataset.event} predictions (JSON)</a></p>`;
         detailRow.dataset.loaded = "1";
     } catch (e) {
-        detailRow.firstElementChild.innerHTML = '<div class="error">Could not load details.</div>';
+        detailRow.firstElementChild.innerHTML = errorState("Couldn’t load gameweek details", "Please close this row and try again.");
     }
 }
 
