@@ -1,12 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0b120e"/>
-  <circle cx="1070" cy="80" r="280" fill="#b8f34a" opacity=".08"/>
-  <circle cx="100" cy="650" r="340" fill="#2dd4bf" opacity=".08"/>
-  <g transform="translate(100 150)">
-    <rect width="92" height="92" rx="24" fill="#b8f34a"/>
-    <path d="M20 67V42h13v25zm20 0V26h13v41zm20 0V13h13v54z" fill="#101914"/>
-    <text x="120" y="70" fill="#fff" font-family="Arial, sans-serif" font-size="72" font-weight="700">FPL Lab</text>
-    <text x="0" y="180" fill="#fff" font-family="Arial, sans-serif" font-size="54" font-weight="700">Your team. Your move.</text>
-    <text x="0" y="245" fill="#9caaa1" font-family="Arial, sans-serif" font-size="30">Transfer advice, captain picks and expected points.</text>
+  <rect width="1200" height="630" fill="#f3f0e7"/>
+  <rect x="58" y="58" width="1094" height="530" fill="#141414"/>
+  <rect x="46" y="46" width="1094" height="530" fill="#ffe44d" stroke="#141414" stroke-width="6"/>
+  <path d="M46 106h1094" stroke="#141414" stroke-width="6"/>
+  <text x="76" y="85" fill="#141414" font-family="Courier New, monospace" font-size="24" font-weight="700">FPL LAB / MANAGER DESK</text>
+  <g transform="translate(90 152)" fill="#141414">
+    <rect width="86" height="86" fill="#53d6c7" stroke="#141414" stroke-width="4"/>
+    <path d="M17 67V42h13v25zm20 0V26h13v41zm20 0V13h13v54z"/>
+    <text x="110" y="66" font-family="Arial Black, sans-serif" font-size="72" font-weight="900">FPL LAB</text>
+    <text x="0" y="185" font-family="Arial Black, sans-serif" font-size="70" font-weight="900">YOUR TEAM.</text>
+    <rect x="-8" y="206" width="580" height="95" fill="#ff91be" stroke="#141414" stroke-width="4"/>
+    <text x="4" y="280" font-family="Arial Black, sans-serif" font-size="70" font-weight="900">YOUR MOVE.</text>
+    <text x="0" y="355" font-family="Courier New, monospace" font-size="24" font-weight="700">TRANSFERS + CAPTAINS + EXPECTED POINTS</text>
   </g>
 </svg>

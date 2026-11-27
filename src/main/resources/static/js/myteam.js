@@ -70,8 +70,11 @@ function render(d) {
             </div>
         </div>
 
-        ${renderAdvice(d)}
-        ${renderCaptains(d)}
+        <div class="section-heading"><div><span class="eyebrow">Your next gameweek</span><h2>Decision board</h2></div><p class="hint">Your moves and your armband. One place.</p></div>
+        <div class="decision-board">
+            ${renderAdvice(d)}
+            ${renderCaptains(d)}
+        </div>
 
         <div class="section-heading"><div><span class="eyebrow">Fixture outlook</span><h2>Your squad, ${gwRange}</h2></div>
         <p class="hint">Expected points per gameweek. Select a player for the breakdown.</p></div>
@@ -119,6 +122,7 @@ function renderAdvice(d) {
 
     return `
         <div class="advice ${a.rollTransfer ? "advice-roll" : ""}">
+            <div class="lane-header"><span>01 / Transfer desk</span><span>${a.rollTransfer ? "HOLD" : "REVIEW"}</span></div>
             <span class="eyebrow">Recommended move</span><h2 class="section-title">Transfer advice</h2>
             <p class="advice-summary">${escapeHtml(a.summary)}</p>
             ${body}
@@ -163,6 +167,9 @@ function renderCaptains(d) {
             <span class="why">${escapeHtml(c.player.reasons.slice(0, 2).join(" · "))}</span>
         </li>`).join("");
     return `
+        <section class="captain-lane">
+        <div class="lane-header"><span>02 / Captain shortlist</span><span>GW${d.nextEvent}</span></div>
         <span class="eyebrow">Armband shortlist</span><h2 class="section-title">Captain picks for GW${d.nextEvent}</h2>
-        <ol class="captain-list">${items}</ol>`;
+        <ol class="captain-list">${items}</ol>
+        </section>`;
 }
