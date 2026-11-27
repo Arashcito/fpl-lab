@@ -57,7 +57,19 @@ Every push to `main` now redeploys automatically.
 
 ---
 
-## 3. cron-job.org: wake the app every 30 minutes (3 min)
+## 3. Keep the app awake and syncing: GitHub Actions (recommended, 2 min)
+
+The workflow `.github/workflows/sync.yml` calls the app's sync every 30 minutes. It only needs one secret:
+
+1. In Render, open the fpl-lab service → **Environment** → copy the value of `SYNC_TOKEN`.
+2. In GitHub, open the repository → **Settings → Secrets and variables → Actions → New repository secret**:
+   name `SYNC_TOKEN`, value = what you copied.
+3. Test it: **Actions → Sync live app → Run workflow**. A green check means it works.
+
+GitHub may delay scheduled runs by a few minutes, which is fine here. (GitHub pauses scheduled workflows in a
+repository with no activity for 60 days; pushing any commit, or re-enabling the workflow, restarts them.)
+
+## 3b. Alternative: cron-job.org (3 min)
 
 A sleeping app can't run its own timer, so an outside service wakes it.
 

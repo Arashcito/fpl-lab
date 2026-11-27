@@ -1,0 +1,44 @@
+# Wakes the free Render server and runs a data sync every 30 minutes, so FPL data stays
+# fresh and predictions are saved before every deadline - without any outside service.
+# Needs the repository secret SYNC_TOKEN (the same value as SYNC_TOKEN in Render).
+# Note: GitHub can delay scheduled runs by a few minutes when it is busy.
+name: Sync live app
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"   # every 30 minutes
+  workflow_dispatch:          # "Run workflow" button
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check the secret is set
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          if [ -z "$SYNC_TOKEN" ]; then
+            echo "::error::Add the SYNC_TOKEN repository secret (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+      - name: Wake the app and sync
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          APP_URL: https://fpl-lab-atan.onrender.com
+        run: |
+          # A sleeping free server takes up to a minute or two to start, so allow a long wait and retry.
+          for attempt in 1 2 3; do
+            status=$(curl -s -o response.json -w "%{http_code}" --max-time 180 \
+              -X POST -H "X-Sync-Token: $SYNC_TOKEN" "$APP_URL/api/sync" || echo "000")
+            echo "Attempt $attempt: HTTP $status"
+            cat response.json 2>/dev/null; echo
+            case "$status" in
+              200|202) echo "Sync done (202 = a sync was already running, e.g. the startup sync)"; exit 0 ;;
+              401) echo "::error::Wrong token: SYNC_TOKEN in GitHub must match SYNC_TOKEN in Render."; exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "::error::The app did not respond after 3 attempts."
+          exit 1
