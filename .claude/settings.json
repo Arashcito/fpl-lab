@@ -1,13 +1,20 @@
 {
+  "enabledPlugins": {
+    "neon-postgres@neon": true,
+    "unslop@heydamir": true
+  },
   "extraKnownMarketplaces": {
     "neon": {
       "source": {
         "source": "github",
         "repo": "neondatabase/agent-skills"
       }
+    },
+    "heydamir": {
+      "source": {
+        "source": "github",
+        "repo": "heydamir/unslop"
+      }
     }
-  },
-  "enabledPlugins": {
-    "neon-postgres@neon": true
   }
 }
