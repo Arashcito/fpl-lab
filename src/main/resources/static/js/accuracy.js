@@ -122,7 +122,7 @@ function gameweekTable(gws) {
     }).join("");
     return `
         <div class="section-heading"><div><span class="eyebrow">Gameweek archive</span><h2>By gameweek</h2></div>
-        <p class="hint">Green underline = best model. Select a gameweek for details.</p></div>
+        <p class="hint">Green = best model. Select a gameweek for details.</p></div>
         <div class="table-scroll">
         <table class="standings-table">
             <thead><tr>

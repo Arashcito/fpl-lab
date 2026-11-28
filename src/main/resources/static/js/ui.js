@@ -10,7 +10,7 @@ function fmt(value, digits = 1) {
 
 function loadingState(label = "Loading data") {
     return `<div class="state-card loading-state" role="status" aria-live="polite">
-        <div class="loader" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="loader" aria-hidden="true"><span class="ball"></span><span class="shadow"></span></div>
         <div>
             <strong>${escapeHtml(label)}</strong>
             <p class="wake-message">The free server may need up to a minute to wake after being idle. Keep this tab open—we’re on it.</p>
@@ -28,7 +28,7 @@ function errorState(title, message, retryAction = "") {
 
 function emptyState(title, message) {
     return `<div class="state-card empty-state">
-        <span class="state-icon" aria-hidden="true">↗</span>
+        <span class="state-icon" aria-hidden="true">–</span>
         <div><strong>${escapeHtml(title)}</strong><p>${escapeHtml(message)}</p></div>
     </div>`;
 }

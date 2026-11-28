@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="See how FPL Lab's formula and machine-learning predictions perform against real FPL points.">
-    <meta name="theme-color" content="#168B45"><title>Accuracy · FPL Lab</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
+    <meta name="theme-color" content="#1E7B3E"><title>Accuracy · FPL Lab</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
 </head>
 <body><div class="app-shell"><div data-site-header data-page="accuracy"></div>
     <main class="page-main">
-        <section class="page-intro"><div><span class="eyebrow">No cherry-picking</span><h1>Every prediction. Scored.</h1><p>Formula, machine-learning model and FPL official—frozen before the deadline and judged after the final whistle.</p></div><div class="page-number" aria-hidden="true">03</div></section>
-        <section class="method-strip"><div><span class="method-dot capture"></span><strong>Before deadline</strong><p>Predictions are saved.</p></div><span aria-hidden="true">→</span><div><span class="method-dot wait"></span><strong>After matches</strong><p>Real points arrive.</p></div><span aria-hidden="true">→</span><div><span class="method-dot score"></span><strong>Models scored</strong><p>Lower error wins.</p></div></section>
+        <section class="page-intro"><div><span class="eyebrow">Post-match analysis</span><h1>Every prediction. Scored.</h1><p>Formula, machine-learning model and FPL official—frozen before the deadline and judged after the final whistle.</p></div></section>
+        <ol class="match-timeline" aria-label="How predictions are scored">
+            <li><span class="minute">Deadline</span><strong>Locked in</strong><p>Every model's predictions are saved and frozen.</p></li>
+            <li><span class="minute">Matches</span><strong>Played</strong><p>Real FPL points come in after the final whistle.</p></li>
+            <li><span class="minute">Full time</span><strong>Scored</strong><p>The model with the smallest error wins the gameweek.</p></li>
+        </ol>
         <div id="accuracy" aria-live="polite"></div>
         <details class="panel explain"><summary>How to read the accuracy metrics <span aria-hidden="true">+</span></summary><div class="metric-definitions">
             <div><strong>Average error</strong><p>Average distance between predicted and real points. Lower is better.</p></div><div><strong>Ranking</strong><p>How closely the predicted player order matched reality. Closer to 1 is better.</p></div><div><strong>Top 10 picks</strong><p>Real average points from each model’s ten highest-rated players.</p></div><div><strong>Bias</strong><p>Above zero means optimistic; below zero means pessimistic.</p></div>

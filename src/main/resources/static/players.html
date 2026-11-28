@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Search, filter and compare every Fantasy Premier League player.">
-    <meta name="theme-color" content="#168B45"><title>Players · FPL Lab</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
+    <meta name="theme-color" content="#1E7B3E"><title>Players · FPL Lab</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
 </head>
 <body><div class="app-shell"><div data-site-header data-page="players"></div>
     <main class="page-main">
-        <section class="page-intro"><div><span class="eyebrow">Full player database</span><h1>Know the whole player pool.</h1><p>Search every FPL player and sort the market by points, price or name.</p></div><div class="page-number" aria-hidden="true">05</div></section>
+        <section class="page-intro"><div><span class="eyebrow">Every registered player</span><h1>Know the whole player pool.</h1><p>Search every FPL player and sort by points, price or name.</p></div></section>
         <section class="stats compact-stats" id="stats" aria-label="Player statistics">
-            <div class="stat-card"><span class="stat-kicker">Database</span><div class="stat-value" id="total-players">—</div><div class="stat-label">Total players</div></div>
-            <div class="stat-card"><span class="stat-kicker">Performance</span><div class="stat-value" id="avg-points">—</div><div class="stat-label">Average points</div></div>
-            <div class="stat-card"><span class="stat-kicker">Market</span><div class="stat-value" id="avg-price">—</div><div class="stat-label">Average price</div></div>
+            <div class="stat-card"><span class="stat-kicker">Players</span><div class="stat-value" id="total-players">—</div><div class="stat-label">Total players</div></div>
+            <div class="stat-card"><span class="stat-kicker">Points</span><div class="stat-value" id="avg-points">—</div><div class="stat-label">Average points</div></div>
+            <div class="stat-card"><span class="stat-kicker">Price</span><div class="stat-value" id="avg-price">—</div><div class="stat-label">Average price</div></div>
         </section>
         <section class="panel filter-panel">
             <form id="players-filter" class="filter-form">
@@ -21,7 +21,7 @@
                 <label><span>Sort by</span><select id="player-sort"><option value="points-desc">Points: high to low</option><option value="price-desc">Price: high to low</option><option value="price-asc">Price: low to high</option><option value="name-asc">Name: A–Z</option></select></label>
             </form>
         </section>
-        <section class="data-section"><div class="section-heading"><div><span class="eyebrow">Market view</span><h2>Players <span id="player-count" class="count-badge"></span></h2></div></div><ul id="players" class="player-grid" aria-live="polite"></ul></section>
+        <section class="data-section"><div class="section-heading"><div><span class="eyebrow">Player cards</span><h2>Players <span id="player-count" class="count-badge"></span></h2></div></div><ul id="players" class="player-grid" aria-live="polite"></ul></section>
     </main><div data-site-footer></div>
 </div>
 <script src="js/layout.js"></script><script src="js/ui.js"></script><script src="js/api.js"></script><script src="js/players.js"></script>
