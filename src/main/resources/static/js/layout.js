@@ -46,7 +46,7 @@
     if (footer) {
         footer.innerHTML = `<footer class="site-footer">
             <p><strong>FPL Lab</strong> · Make the call before the deadline, not after the final whistle.</p>
-            <p class="sub">Unofficial and not affiliated with the Premier League.</p>
+            <p class="sub"><a href="find-id.html">Find your team ID</a> · Unofficial and not affiliated with the Premier League.</p>
         </footer>`;
     }
 })();

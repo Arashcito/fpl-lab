@@ -377,6 +377,38 @@ summary { cursor: pointer; font-weight: 600; }
 .site-footer p { margin: 0; }
 .site-footer strong { color: var(--text); }
 
+
+/* Find-your-ID guide: numbered steps like a team sheet, the address bar as the hero. */
+.id-example { margin: 0 0 28px; }
+.address-bar { display: flex; align-items: center; gap: 10px; max-width: 720px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: clamp(.85rem, 2.4vw, 1.1rem); overflow-wrap: anywhere; }
+.address-bar mark { padding: 1px 4px; border-radius: 3px; color: #17141C; background: var(--card-yellow); font-weight: 700; }
+.address-lock { flex: 0 0 auto; width: 12px; height: 10px; margin-top: 4px; border-radius: 2px; background: var(--text-soft); position: relative; }
+.address-lock::before { content: ""; position: absolute; left: 2px; top: -6px; width: 4px; height: 5px; border: 2px solid var(--text-soft); border-bottom: 0; border-radius: 4px 4px 0 0; }
+.id-example .hint { margin: 10px 0 0 18px; font-size: var(--text-sm); }
+.id-guides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.id-guide h2 { margin-bottom: 8px; }
+.id-guide > p { color: var(--text-soft); }
+.id-steps { display: grid; gap: 14px; margin: 18px 0 0; padding: 0; list-style: none; counter-reset: step; }
+.id-steps li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 2px 12px; counter-increment: step; }
+.id-steps li::before { content: counter(step); grid-row: span 2; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: #FFFFFF; background: var(--purple); font: 800 1.1rem/1 var(--display); }
+.id-steps strong { font: 800 1.2rem/1.2 var(--display); text-transform: uppercase; }
+.id-steps span { color: var(--text-soft); font-size: var(--text-sm); }
+.id-steps span strong, .faq strong { font: inherit; font-weight: 700; text-transform: none; color: var(--text); }
+.nowrap { white-space: nowrap; }
+:root[data-theme="dark"] .id-steps li::before { background: var(--grass); }
+:root[data-theme="dark"] .id-paste .button-primary { background: var(--grass); }
+:root[data-theme="dark"] .id-paste .button-primary:hover { background: var(--grass-2); }
+.id-paste { margin-top: 20px; }
+.id-paste .section-heading { margin-top: 0; }
+.id-paste .button { flex: 0 0 auto; gap: 24px; }
+.id-result { margin: 12px 0 0; font-size: var(--text-sm); }
+.id-result:empty { display: none; }
+.faq { display: grid; gap: 10px; }
+.faq details { padding: 16px 20px; }
+.faq summary { font-weight: 700; }
+.faq p { margin: 10px 0 0; color: var(--text-soft); }
+.form-help a { color: var(--purple); font-weight: 700; }
+
 @media (max-width: 1050px) {
     .nav a { padding-inline: 8px; }
     .nav a.active::after { left: 8px; right: 8px; }
@@ -399,6 +431,7 @@ summary { cursor: pointer; font-weight: 600; }
     .hero .form-row { flex-direction: row; }
     .pre-match { grid-template-columns: 1fr; gap: 20px; }
     .metric-definitions { grid-template-columns: 1fr 1fr; }
+    .id-guides { grid-template-columns: 1fr; }
 }
 @media (max-width: 720px) {
     main, .site-header, .site-footer { width: calc(100% - 32px); }

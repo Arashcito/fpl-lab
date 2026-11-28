@@ -3,11 +3,16 @@ const entryInput = document.getElementById("entry-id");
 const result = document.getElementById("result");
 const submitButton = form.querySelector("button[type='submit']");
 
-// remember the last team ID on this device
-try {
-    const saved = localStorage.getItem("fpl-lab-entry-id");
-    if (saved) entryInput.value = saved;
-} catch (e) { /* storage unavailable */ }
+// an ID in the address (from the find-your-ID page) wins; otherwise use the last one on this device
+const linkedId = new URLSearchParams(location.search).get("id");
+if (linkedId && /^\d{1,10}$/.test(linkedId)) {
+    entryInput.value = linkedId;
+} else {
+    try {
+        const saved = localStorage.getItem("fpl-lab-entry-id");
+        if (saved) entryInput.value = saved;
+    } catch (e) { /* storage unavailable */ }
+}
 
 form.addEventListener("submit", e => {
     e.preventDefault();

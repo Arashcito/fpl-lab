@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="How to find your Fantasy Premier League team ID on your phone or computer, in under a minute.">
+    <meta name="theme-color" content="#1E7B3E"><title>Find Your Team ID · FPL Lab</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap"><link rel="stylesheet" href="css/style.css"><script src="js/theme.js"></script>
+</head>
+<body><div class="app-shell"><div data-site-header data-page="find-id"></div>
+    <main class="page-main">
+        <section class="page-intro"><div><span class="eyebrow">Before kick-off</span><h1>Find your team ID.</h1><p>Every FPL team has a number. FPL Lab needs it to load your squad. Finding it takes under a minute.</p></div></section>
+
+        <section class="id-example" aria-label="Where the ID appears">
+            <div class="address-bar"><span class="address-lock" aria-hidden="true"></span><span>fantasy.premierleague.com/entry/<mark>1234567</mark>/event/13</span></div>
+            <p class="hint">Your ID is the number straight after <strong>/entry/</strong>. Here it would be <strong>1234567</strong>.</p>
+        </section>
+
+        <div class="id-guides">
+            <section class="panel id-guide">
+                <span class="eyebrow">On your phone</span>
+                <h2>Premier League app</h2>
+                <p>The app doesn't display your team ID, so you'll need your phone's browser for this one step. You only have to do it once.</p>
+                <ol class="id-steps">
+                    <li><strong>Open your browser</strong><span>Safari, Chrome or any other, and go to <span class="nowrap">fantasy.premierleague.com</span>.</span></li>
+                    <li><strong>Sign in</strong><span>Use the same email and password as the Premier League app.</span></li>
+                    <li><strong>Tap Points</strong><span>Open your Points page.</span></li>
+                    <li><strong>Read the address</strong><span>Tap the address bar to see the full link and find the number after <strong>/entry/</strong>. You can also copy the whole link and paste it below.</span></li>
+                </ol>
+            </section>
+            <section class="panel id-guide">
+                <span class="eyebrow">On a computer</span>
+                <h2>FPL website</h2>
+                <p>Quickest if you're at a laptop or desktop.</p>
+                <ol class="id-steps">
+                    <li><strong>Go to the FPL site</strong><span>Open <span class="nowrap">fantasy.premierleague.com</span> and sign in.</span></li>
+                    <li><strong>Click Points</strong><span>It's in the menu next to Pick Team.</span></li>
+                    <li><strong>Check the address bar</strong><span>The number after <strong>/entry/</strong> is your team ID.</span></li>
+                </ol>
+            </section>
+        </div>
+
+        <section class="panel id-paste">
+            <div class="section-heading"><div><span class="eyebrow">Shortcut</span><h2>Paste your link</h2></div><p class="hint">Copied the whole Points page link? Paste it here and we'll find the ID for you.</p></div>
+            <form id="id-form" class="filter-form" novalidate>
+                <label class="search-field"><span>Link or team ID</span><input id="id-input" type="text" inputmode="url" placeholder="fantasy.premierleague.com/entry/1234567/event/13" autocomplete="off" aria-describedby="id-result"></label>
+                <button class="button button-primary" type="submit"><span>Analyse my team</span><span aria-hidden="true">→</span></button>
+            </form>
+            <p id="id-result" class="id-result" aria-live="polite"></p>
+        </section>
+
+        <section class="data-section">
+            <div class="section-heading"><div><span class="eyebrow">Stoppage time</span><h2>Common questions</h2></div></div>
+            <div class="faq">
+                <details class="panel"><summary>Is my ID the same every season?</summary><p>No. You get a new team, and a new ID, when you sign up for a new season. If last season's number stops working, look it up again.</p></details>
+                <details class="panel"><summary>Do I have to sign in to FPL Lab?</summary><p>No. Your ID only lets FPL Lab read your public team page, the same one your mini-league rivals can see. It can't make transfers or change anything on your account.</p></details>
+                <details class="panel"><summary>Can I look up a friend's or rival's team?</summary><p>Yes. In FPL, open a mini-league and click their team name. Their ID is the number after <strong>/entry/</strong> in that address.</p></details>
+                <details class="panel"><summary>Will FPL Lab remember my ID?</summary><p>Yes, on this device. The last ID you entered is filled in for you next time.</p></details>
+            </div>
+        </section>
+    </main><div data-site-footer></div>
+</div>
+<script src="js/layout.js"></script>
+<script>
+(function () {
+    const form = document.getElementById("id-form");
+    const input = document.getElementById("id-input");
+    const result = document.getElementById("id-result");
+
+    // Accepts a bare ID or any FPL link containing /entry/<id>
+    function extractId(text) {
+        const value = text.trim();
+        if (/^\d{1,10}$/.test(value)) return value;
+        const match = value.match(/entry\/(\d{1,10})/i);
+        return match ? match[1] : null;
+    }
+
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+        const id = extractId(input.value);
+        if (!id) {
+            result.className = "id-result negative";
+            result.textContent = input.value.trim()
+                ? "That link has no team ID in it. Make sure you copied it from your Points page: it should contain /entry/ followed by a number."
+                : "Paste your Points page link or type your team ID first.";
+            return;
+        }
+        result.className = "id-result positive";
+        result.textContent = `Found it: your team ID is ${id}. Loading your team…`;
+        window.location.href = `myteam.html?id=${encodeURIComponent(id)}`;
+    });
+})();
+</script>
+</body></html>
