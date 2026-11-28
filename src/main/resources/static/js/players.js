@@ -42,7 +42,7 @@ function renderPlayers() {
         return;
     }
     playerList.innerHTML = players.map(player => `
-        <li class="player-card">
+        <li class="player-card" data-pos="${escapeHtml(shortPosition(player.positionName))}">
             <div class="player-name"><span>${escapeHtml(player.webName)}</span><span class="position-chip">${escapeHtml(shortPosition(player.positionName))}</span></div>
             <div class="player-info">
                 <div class="player-detail"><span>Club</span><span class="player-detail-value">${escapeHtml(player.teamName)}</span></div>

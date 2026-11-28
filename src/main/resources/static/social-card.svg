@@ -1,16 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#FFFFFF"/>
-  <rect x="58" y="58" width="1094" height="530" fill="#141414"/>
-  <rect x="46" y="46" width="1094" height="530" fill="#ffe44d" stroke="#141414" stroke-width="6"/>
-  <path d="M46 106h1094" stroke="#141414" stroke-width="6"/>
-  <text x="76" y="85" fill="#141414" font-family="Courier New, monospace" font-size="24" font-weight="700">FPL LAB / MANAGER DESK</text>
-  <g transform="translate(90 152)" fill="#141414">
-    <rect width="86" height="86" fill="#168B45" stroke="#141414" stroke-width="4"/>
-    <path d="M17 67V42h13v25zm20 0V26h13v41zm20 0V13h13v54z"/>
-    <text x="110" y="66" font-family="Arial Black, sans-serif" font-size="72" font-weight="900">FPL LAB</text>
-    <text x="0" y="185" font-family="Arial Black, sans-serif" font-size="70" font-weight="900">YOUR TEAM.</text>
-    <rect x="-8" y="206" width="580" height="95" fill="#37003C" stroke="#141414" stroke-width="4"/>
-    <text x="4" y="280" fill="#FFFFFF" font-family="Arial Black, sans-serif" font-size="70" font-weight="900">YOUR MOVE.</text>
-    <text x="0" y="355" font-family="Courier New, monospace" font-size="24" font-weight="700">TRANSFERS + CAPTAINS + EXPECTED POINTS</text>
+  <defs>
+    <pattern id="mow" width="200" height="630" patternUnits="userSpaceOnUse">
+      <rect width="100" height="630" fill="#1E7B3E"/><rect x="100" width="100" height="630" fill="#23874A"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#mow)"/>
+  <g fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4">
+    <rect x="30" y="30" width="1140" height="570"/>
+    <path d="M600 30v570"/>
+    <circle cx="600" cy="315" r="110"/>
+    <path d="M30 175h150v280H30M1170 175h-150v280h150"/>
+  </g>
+  <circle cx="600" cy="315" r="7" fill="#fff" fill-opacity=".55"/>
+  <g font-family="Barlow Condensed, Arial Narrow, Arial, sans-serif" font-weight="800">
+    <text x="90" y="150" fill="#FFD43B" font-size="34" letter-spacing="5">FPL LAB</text>
+    <text x="90" y="290" fill="#fff" font-size="120">YOUR TEAM.</text>
+    <text x="90" y="410" fill="#FFD43B" font-size="120">YOUR MOVE.</text>
+    <text x="90" y="500" fill="#fff" font-size="34" letter-spacing="3">TRANSFERS · CAPTAIN · EXPECTED POINTS</text>
   </g>
 </svg>

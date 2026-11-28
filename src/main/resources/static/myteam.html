@@ -4,32 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Get data-backed FPL transfer advice, captain picks and expected points for your team.">
-    <meta name="theme-color" content="#ffe44d">
+    <meta name="theme-color" content="#1E7B3E">
     <meta property="og:title" content="FPL Lab — Your team, your move">
     <meta property="og:description" content="Transfer advice, captain picks and expected points for your FPL team.">
     <meta property="og:image" content="https://fpl-lab-atan.onrender.com/social-card.svg">
     <title>My Team · FPL Lab</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap"><link rel="stylesheet" href="css/style.css">
     <script src="js/theme.js"></script>
 </head>
 <body>
     <div class="app-shell">
         <div data-site-header data-page="myteam"></div>
         <main>
-            <div class="desk-toolbar"><span>FPL LAB / MANAGER DESK</span><span>Plan. Compare. Make your move.</span></div>
-            <section class="hero hero-team">
+            <section class="hero hero-team pitch-surface">
                 <div class="hero-copy">
-                    <span class="eyebrow">Fantasy decisions, explained</span>
+                    <span class="eyebrow">Before the deadline</span>
                     <h1>Make the move<span>before your rivals do.</span></h1>
-                    <p>See your strongest transfers, captain picks and fixture outlook—calculated for your actual FPL squad.</p>
+                    <p>Transfers, captain and fixture outlook, worked out for the FPL squad you actually have.</p>
                 </div>
                 <form id="team-form" class="team-form hero-form">
-                    <div class="window-title"><span>Squad analyser.exe</span><span class="window-controls" aria-hidden="true">_ □ ×</span></div>
-                    <div class="form-heading">
-                        <span class="step-number">01</span>
-                        <div><strong>Analyse your squad</strong><span>Enter the ID from your FPL Points page.</span></div>
-                    </div>
+                    <div class="sheet-head"><h2>Team sheet</h2><span>Your FPL squad, analysed</span></div>
                     <label class="field-wide">
                         <span>FPL team ID</span>
                         <input id="entry-id" type="number" inputmode="numeric" min="1" required placeholder="e.g. 1234567" autocomplete="off">
@@ -39,14 +34,14 @@
                         <label><span>Free transfers</span><select id="free-transfers"><option value="">Auto-detect</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
                     </div>
                     <button class="button button-primary" type="submit"><span>Analyse my team</span><span aria-hidden="true">→</span></button>
-                    <p class="form-help">Find it in: <strong>fantasy.premierleague.com/entry/<mark>1234567</mark>/event/10</strong></p>
+                    <p class="form-help">Your ID is in the address of your FPL Points page: fantasy.premierleague.com/entry/<mark>1234567</mark>/event/10</p>
                 </form>
             </section>
             <section id="result" class="results" aria-live="polite"></section>
-            <section class="trust-strip" aria-label="How FPL Lab helps">
-                <div><span>01</span><strong>Your real squad</strong><p>Budget, selling prices and free transfers included.</p></div>
-                <div><span>02</span><strong>Fixture-aware</strong><p>Plan across the next one to six gameweeks.</p></div>
-                <div><span>03</span><strong>Fully transparent</strong><p>Open any player to see how the points were built.</p></div>
+            <section class="pre-match" aria-label="What FPL Lab looks at">
+                <div><strong>Your real squad</strong><p>Bank, selling prices, free transfers and the three-per-club rule.</p></div>
+                <div><strong>The fixtures ahead</strong><p>Who each player faces over the next one to six gameweeks, home or away.</p></div>
+                <div><strong>No black box</strong><p>Open any player to see minutes, goals, assists, clean sheets and bonus behind the number.</p></div>
             </section>
         </main>
         <div data-site-footer></div>

@@ -13,7 +13,7 @@
         header.innerHTML = `
             <header class="site-header">
                 <a class="brand" href="myteam.html" aria-label="FPL Lab home">
-                    <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <span class="brand-mark" aria-hidden="true"></span>
                     <span><strong>FPL</strong> Lab</span>
                 </a>
                 <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
@@ -45,7 +45,7 @@
     const footer = document.querySelector("[data-site-footer]");
     if (footer) {
         footer.innerHTML = `<footer class="site-footer">
-            <p><strong>FPL Lab</strong> · Decisions backed by data, not hindsight.</p>
+            <p><strong>FPL Lab</strong> · Make the call before the deadline, not after the final whistle.</p>
             <p class="sub">Unofficial and not affiliated with the Premier League.</p>
         </footer>`;
     }
